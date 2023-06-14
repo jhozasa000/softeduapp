@@ -4,9 +4,6 @@ import styles from './page.module.css'
 import logo from '../../public/logo.png'
 
 export default function Home() {
-
-  console.log('process.env.NETLIFY_NEXT_PLUGIN_SKIP_VALUE  ', process.env.NETLIFY_NEXT_PLUGIN_SKIP_VALUE)
-
   return (
    <>
       <main className={styles.backgroundlogin}>
