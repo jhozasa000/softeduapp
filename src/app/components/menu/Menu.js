@@ -2,14 +2,18 @@
 import Link from 'next/link';
 import logomenu from '../../../../public/logo.png'
 import  Image  from 'next/image';
-import { FirstletterUpper } from '../functions/Functions';
-import { useEffect } from 'react';
+import { FirstletterUpper } from '../functions/helpers';
+import { useEffect, useContext} from 'react';
 import styles from './menu.module.css';
+import { GlobalContext } from '../context/themecontext';
 
 export default  function Menu(page) {
+    const { datasite, setDatasite } = useContext(GlobalContext);
+
 
     useEffect(() => {
         import("bootstrap/dist/js/bootstrap");
+        console.log('datasite menu  ', datasite)
     }, []);
 
     const menu = [
@@ -30,7 +34,7 @@ export default  function Menu(page) {
                 </li>
     })
 
-const load = <>
+    const load = <>
     <header>
         <nav className="navbar">
             <div className="container-fluid">
