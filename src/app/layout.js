@@ -1,6 +1,7 @@
 import './globals.css'
 import { Roboto } from 'next/font/google'
-import 'bootstrap/dist/css/bootstrap.css'; 
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-icons/font/bootstrap-icons.css'
 import { Context }  from './components/context/themecontext';
 
 const roboto = Roboto({

@@ -58,7 +58,9 @@ export default function Login() {
                       <input type="password" className="form-control " name='inputPassword' id="inputPassword"  ref={inputpass}/>
                     </div>
                   </div>
-            <button className='btn btn-primary mt-5' onClick={() => login()}>Ingresar</button>
+                  
+            <button className='btn btn-primary mt-5' onClick={() => login()}>Ingresar</button><p></p>
+            <span className="badge bg-light text-dark"> Usuario: admin - Clave: 123</span>
         </div>
       </main>
 
