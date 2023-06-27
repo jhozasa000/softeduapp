@@ -5,9 +5,19 @@ import  { useState, createContext, useContext } from "react";
 export const GlobalContext = createContext(null);
 
 export const Context = ({ children })  => {
-    const [datasite, setDatasite] = useState({
+    let [datasite, setDatasite] = useState({
         user:false,
-        data:{}
+        calendario:[],
+        jornada:[],
+        docentes:[],
+        grados:[],
+        materias:[],
+        estudiantes:[],
+        notas:[],
+        reportes:[],
+        usuario:[],
+        horarios:[],
+        profesion:[]
     });
   
     return (

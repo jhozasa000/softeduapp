@@ -1,25 +1,30 @@
-'use client'
 import Menu from "../components/menu/Menu"
-import { GlobalContext } from '../components/context/themecontext';
-import { useContext, useEffect } from "react";
 
-
- const metadata = {
+ export const metadata = {
     title: 'Notas',
     description: 'Notas',
   }
 
 export default function Notas(){    
 
-    const { datasite, setDatasite } = useContext(GlobalContext);
-
-    useEffect(() => {
-        console.log('datasite  notas   ', datasite)
-    },[]);
-
     return(
         <main>
             <Menu flag='notas' />
+            <div className="container-fluid mt-5"> 
+                <div className="row">
+                    <div className="col-sm-12 col-md-6 mb-2" >
+                        <div className="card h-100">
+                            <h3 className="my-2 text-center">Insertar nota</h3>
+                        </div>
+                        
+                    </div>
+                    <div className="col-sm-12 col-md-6 mb-2">
+                    <div className="card h-100">
+                            <h3 className="my-2 text-center">Notas</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
     )
 

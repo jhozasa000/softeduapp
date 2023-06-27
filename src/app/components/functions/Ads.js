@@ -11,8 +11,8 @@ const Ads = () => {
         <div className="card">
             <div className={`card-body text-white ${styles.navblue}`}>
                 <ul className='list-group'>
-                    {params.map( ({title, description,date}) => {
-                        return <li className="list-group-item d-flex text-start text-wrap">
+                    {params.map( ({title, description,date,id}) => {
+                        return <li key={id} className="list-group-item d-flex text-start text-wrap">
                                     <div className="ms-2 me-auto">
                                         <div className='text-primary fw-bold'>{title}</div>
                                             <i className="bi bi-arrow-right-circle ms-3">{description}</i>

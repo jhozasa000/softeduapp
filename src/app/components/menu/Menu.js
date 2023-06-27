@@ -3,17 +3,14 @@ import Link from 'next/link';
 import logomenu from '../../../../public/logo.png'
 import  Image  from 'next/image';
 import { FirstletterUpper } from '../functions/helpers';
-import { useEffect, useContext} from 'react';
+import { useEffect} from 'react';
 import styles from './menu.module.css';
-import { GlobalContext } from '../context/themecontext';
+import Session from '../functions/Session';
 
 export default  function Menu(page) {
-    const { datasite, setDatasite } = useContext(GlobalContext);
-
 
     useEffect(() => {
         import("bootstrap/dist/js/bootstrap");
-        console.log('datasite menu  ', datasite)
     }, []);
 
     const menu = [
@@ -36,6 +33,7 @@ export default  function Menu(page) {
 
     const load = <>
     <header>
+        <Session />
         <nav className="navbar">
             <div className="container-fluid">
                 <Link className="navbar-brand ms-5" href={'/home'}>
@@ -44,7 +42,7 @@ export default  function Menu(page) {
                     </>
                 </Link>
                 <form className="d-flex" role="search">
-                <input className="form-control me-2" type="search" placeholder="Buscar" aria-label="Search" />
+                <input className="form-control me-2" type="search" placeholder="Buscar" aria-label="Search" name="btn_search" id='btn_search'/>
                 </form>
             </div>
         </nav>
@@ -63,6 +61,6 @@ export default  function Menu(page) {
     </header>
     </>
 
-return load
+return  load
 
 }
