@@ -7,17 +7,32 @@ export const GlobalContext = createContext(null);
 export const Context = ({ children })  => {
     let [datasite, setDatasite] = useState({
         user:false,
-        calendario:[],
-        jornada:[],
-        docentes:[],
-        grados:[],
-        materias:[],
+        calendario:['calendario a'],
+        jornada:['tarde','mañana'],
+        docentes:[
+          {
+            inp:'jhonnatan zapata',
+            inpcedula:'1130633993',
+            inpPro:'sistemas',
+            inptel:'3177168312',
+            inpdir:'calle 20 norte',
+            filesteacher:0
+          }
+        ],
+        grados:[
+          {
+            inpG:'grado 1',
+            inpC:'calendario a',
+            inpJ:'tarde'
+          }
+        ],
+        materias:['matematicas','sociales','español'],
         estudiantes:[],
         notas:[],
         reportes:[],
         usuario:[],
         horarios:[],
-        profesion:[]
+        profesion:['ingles','sistemas']
     });
   
     return (

@@ -2,7 +2,7 @@
 import { Reducer } from "../components/context/themecontext";
 import { Alertas } from "../components/functions/helpers";
 import Menu from "../components/menu/Menu"
-import { useEffect, useRef, useState } from 'react';
+import { use, useEffect, useReducer, useRef, useState } from 'react';
 
 const metadata = {
     title: 'Docentes',
@@ -21,6 +21,7 @@ export default function Docentes(){
     const inpTel = useRef(null);
     const inpDir = useRef(null);
     const inpFile = useRef(null);
+    const inpcedula = useRef(null)
     const [fillcarr, setfillcarr] = useState('');
     const [fillteacher, setFillteacher] = useState('');
     const [loadteacher, setLoadteacher] = useState(true);
@@ -66,8 +67,8 @@ export default function Docentes(){
                         <div className="ms-2 me-auto ">
                             <i className="bi bi-arrow-right-circle ms-3">{ele}</i>
                         </div>
-                        <span><i class="bi bi-trash fs-2 text-danger"></i></span>
-                        <span><i class="bi bi-pencil-square fs-2 text-success"></i></span>
+                        <span><i className="bi bi-trash fs-4 px-2 text-danger"></i></span>
+                        <span><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></span>
                     </li>
         }))
     }
@@ -84,13 +85,36 @@ export default function Docentes(){
 
     const insertTeacher = () => {
 
-        if(inp.current.value != '' || inpPro.current.value != '' || inpTel.current.value != '' || inpDir.current.value != ''){
+        if(!inp.current.value  || !inpcedula.current.value  || !inpPro.current.value  || !inpTel.current.value  || !inpDir.current.value ){
 
+            console.log('inpcedula.current.value ', inpcedula.current.value);
+            console.log('inp.current.value ', inp.current.value);
+            console.log('inpPro.current.value ', inpPro.current.value);
+            console.log('inpTel.current.value ', inpTel.current.value);
+            console.log('inpDir.current.value ', inpDir.current.value);
+
+            Alertas('Información','Los campos no pueden estar vacíos')
+            return false
+        }
+       const id = inpcedula.current.value 
+       const validate = datasite.docentes.filter((ele) =>{
+
+            console.log('ele.inpcedula   ',ele.inpcedula);
+            console.log('id  ', id);
+
+
+            return ele.inpcedula == id
+        })
+ 
+        if(validate.length){
+            Alertas('Información','Ya existe un docente registrado con la cédula ',inpcedula.current.value)
+            return false
         }
 
 
         const formdata = new FormData()
         formdata.append('inp',inp.current.value);
+        formdata.append('inpcedula',inpcedula.current.value);
         formdata.append('inpPro',inpPro.current.value);
         formdata.append('inptel',inpTel.current.value);
         formdata.append('inpdir',inpDir.current.value);    
@@ -105,6 +129,8 @@ export default function Docentes(){
             obj[pair[0]] = pair[1]
         }
 
+        console.log('obj  ', obj);
+
         setDatasite((prevState) => ({...prevState,docentes:[
                 ...prevState.docentes,
                 obj,
@@ -113,14 +139,14 @@ export default function Docentes(){
     }
 
     const loaddataTeacher = () =>{
-            setFillteacher( datasite.docentes.map(({inp,inpPro},x) =>{
+            setFillteacher( datasite.docentes.map(({inp,inpPro,inpcedula},x) =>{
                 return <li key={x} className="list-group-item d-flex text-start text-wrap">
                             <div className="ms-2 me-auto">
-                                <div className='text-primary fw-bold'>{inp}</div>
+                                <div className='text-primary fw-bold'>{inp} - {inpcedula}</div>
                                     <i className="bi bi-arrow-right-circle ms-3">{inpPro}</i>
                             </div>
-                            <span><i class="bi bi-trash fs-2 text-danger"></i></span>
-                            <span><i class="bi bi-pencil-square fs-2 text-success"></i></span>
+                            <span><i className="bi bi-trash fs-4 px-2 text-danger"></i></span>
+                            <span><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></span>
                         </li>
         }))
     }
@@ -162,10 +188,16 @@ export default function Docentes(){
                                 </div>
                             </div>
                             <div className="row align-items-center justify-content-center my-2">
-                                <label htmlFor="inpPr" className="col-5 col-form-label col-form-label-sm fs-4 fw-bold">Profesión</label>
+                                <label htmlFor="inpcedula" className="col-5 col-form-label col-form-label-sm fs-4 fw-bold">Cédula</label>
+                                <div className="col-6">
+                                    <input type="text" className="form-control border-primary" name='inpcedula' id="inpcedula"  ref={inpcedula}/>
+                                </div>
+                            </div>
+                            <div className="row align-items-center justify-content-center my-2">
+                                <label htmlFor="inpPro" className="col-5 col-form-label col-form-label-sm fs-4 fw-bold">Profesión</label>
                                 <div className="col-6">
                                     <select name='inpPro' id="inpPro"  ref={inpPro} className="form-select border-primary">
-                                        <option key={0} value={0}>Selecciona profesión</option>
+                                        <option key={0} value={''}>Selecciona profesión</option>
                                         {fillcarr}
                                     </select> 
 
@@ -191,7 +223,9 @@ export default function Docentes(){
                                     </label>
                                 </div>
                             </div>
-                            <div className="text-center"> <button className='btn btn-primary my-3 ' onClick={insertTeacher}>Insertar</button></div>
+                            <div className="text-center"> 
+                                <button className='btn btn-primary my-3 ' onClick={insertTeacher}>Insertar</button>
+                            </div>
 
                         </div>
                         

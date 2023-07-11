@@ -62,8 +62,8 @@ export default function Calendario(){
              <div className="ms-2 me-auto ">
                  <i className="bi bi-arrow-right-circle ms-3">{ele}</i>
              </div>
-             <span><i class="bi bi-trash fs-2 text-danger"></i></span>
-             <span><i class="bi bi-pencil-square fs-2 text-success"></i></span>
+             <span><i className="bi bi-trash fs-4 px-2 text-danger"></i></span>
+             <span><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></span>
          </li>
         }))
     }
@@ -98,8 +98,8 @@ export default function Calendario(){
                         <div className="ms-2 me-auto ">
                             <i className="bi bi-arrow-right-circle ms-3">{ele}</i>
                         </div>
-                        <span><i class="bi bi-trash fs-2 text-danger"></i></span>
-                        <span><i class="bi bi-pencil-square fs-2 text-success"></i></span>
+                        <span><i className="bi bi-trash fs-4 px-2 text-danger"></i></span>
+                        <span><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></span>
                     </li>
         }))
     }

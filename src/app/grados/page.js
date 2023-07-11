@@ -12,47 +12,64 @@ const metadata = {
 export default function Grados(){    
 
     const inputNomCourse = useRef(null);
+    const inputcal = useRef(null);
+    const inputjor = useRef(null);
     const { datasite, setDatasite } = Reducer();
     const [loadcourse, setLoadcourse] = useState(true);
     const [fillcor, setFillcor] = useState('');
+    const [fillcal, setFillcal] = useState(true);
+    const [fillday, setFillday] = useState(true);
 
     useEffect(() => {
         setLoadcourse(false)
         loaddata()
+        setFillcal(datasite.calendario.map((ele,key) => { return <option key={key+1} value={ele}>{ele}</option>}))
+        setFillday(datasite.jornada.map((ele,key) => { return <option key={key+1} value={ele}>{ele}</option>}))
     }, [loadcourse]);
 
     const insertCourse = () =>{
-        const inpNomPro = inputNomCourse.current.value.trim()
-        if(!inpNomPro){
-            Alertas('Información','El campo no puede estar vacío')
+        const inpGr = inputNomCourse.current.value.trim()
+        const inpCa = inputcal.current.value
+        const inpJo = inputjor.current.value
+
+        if(!inpGr|| !inpCa || !inpJo){
+            Alertas('Información','Los campos no pueden estar vacíos')
             return false
         }
-        const validate = datasite.grados.filter((ele) =>{
-            return ele == inpNomPro
+        const validate = datasite.grados.filter(({inpG,inpC, inpJ}) =>{
+            return inpGr == inpG && inpCa == inpC &&  inpJo == inpJ
         })
 
         if(validate.length){
             Alertas('Información','Ya existe el grado')
             return false
         }
+        const obj = new Object();
+        obj['inpG'] = inpGr
+        obj['inpC'] = inpCa
+        obj['inpJ'] = inpJo
+
 
        setDatasite((prevState) => ({...prevState,grados:[
                 ...prevState.grados,
-                inpNomPro,
+                obj,
         ]}))
         inputNomCourse.current.value = ''
+        inputcal.current.value = ''
+        inputjor.current.value = ''
         setLoadcourse(true)
     }
 
     const loaddata = () =>{
 
-        setFillcor( datasite.grados.map((ele,x) =>{
+        setFillcor( datasite.grados.map(({inpG,inpC,inpJ},x) =>{
              return <li key={x} className="list-group-item d-flex border-0 align-items-center justify-content-center">
                         <div className="ms-2 me-auto">
-                            <i className="bi bi-arrow-right-circle ms-3">{ele}</i>
-                        </div>
-                        <span><i class="bi bi-trash fs-2 text-danger"></i></span>
-                        <span><i class="bi bi-pencil-square fs-2 text-success"></i></span>
+                                <div className='text-primary fw-bold'>{inpG}</div>
+                                    <i className="bi bi-arrow-right-circle ms-3">{inpC} - {inpJ}</i>
+                            </div>
+                        <span><i className="bi bi-trash fs-4 px-2 text-danger"></i></span>
+                        <span><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></span>
                     </li>
         }))
     }
@@ -73,6 +90,26 @@ export default function Grados(){
                                     <input type="text" className="form-control " name='inputNomCourse' id="inputNomCourse"  ref={inputNomCourse}/>
                                 </div>
                             </div>
+                            <div className="row align-items-center justify-content-center">
+                                <label htmlFor="inputNomCourse" className="col-5 col-form-label col-form-label-sm fs-4 fw-bold">Calendario</label>
+                                <div className="col-6">
+                                    <select className="form-select" ref={inputcal}>
+                                        <option key={0} value={''}>Seleccione calendario</option>
+                                        {fillcal}
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="row align-items-center justify-content-center">
+                                <label htmlFor="inputNomCourse" className="col-5 col-form-label col-form-label-sm fs-4 fw-bold">Jornada</label>
+                                <div className="col-6">
+                                    <select className="form-select" ref={inputjor}>
+                                        <option key={0} value={''}>Seleccione jornada</option>
+                                        {fillday}
+                                    </select>
+                                </div>
+                            </div>
+
+                            
                             <div className="text-center"> <button className='btn btn-primary my-3 ' onClick={insertCourse}>Insertar</button></div>
                         </div>
                         
