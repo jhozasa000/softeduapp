@@ -5,7 +5,7 @@ import  { useState, createContext, useContext } from "react";
 export const GlobalContext = createContext(null);
 
 export const Context = ({ children })  => {
-    let [datasite, setDatasite] = useState({
+    const [datasite, setDatasite] = useState({
         user:false,
         calendario:['calendario a'],
         jornada:['tarde','mañana'],
