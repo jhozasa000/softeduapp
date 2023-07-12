@@ -27,7 +27,7 @@ export default  function Menu(page) {
     const loadmenu = menu.map(({link},i) => {
         const color = page.flag == link ? 'active':'text-white'
         return  <li key={i} className="nav-item flex-sm-fill text-sm-center mx-2"> 
-                    <Link  className={`nav-link  ${color}`}  href={`/${link}`}>{FirstletterUpper(link)}</Link>
+                    <Link  className={`nav-link  ${color}`} prefetch={false} href={`/${link}`}>{FirstletterUpper(link)}</Link>
                 </li>
     })
 
