@@ -27,6 +27,7 @@ export const Context = ({ children })  => {
           }
         ],
         materias:['matematicas','sociales','español'],
+        materiasrelaion:[],
         estudiantes:[],
         notas:[],
         reportes:[],
