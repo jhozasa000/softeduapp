@@ -27,8 +27,27 @@ export const Context = ({ children })  => {
           }
         ],
         materias:['matematicas','sociales','español'],
-        materiasrelaion:[],
-        estudiantes:[],
+        materiasrelaion:[
+          {
+            inpm:'matematicas',inpg:'grado 1 - calendario a - tarde',inpd:'jhonnatan zapata - sistemas'
+          }
+        ],
+        estudiantes:[
+          {
+            inNom:'Jhonnatan',
+            inApe:'Zapata S',
+            inBir:'16/07/1987',
+            inpId:1130633993,
+            inTel:3177168312,
+            inMail:'jhozasa@hotmail.com'
+          }
+        ],
+        estudiantesrelacion:[
+          {
+            idstu:1130633993,
+            idgrade: 'grado 1 - calendario a - tarde'
+          }
+        ],
         notas:[],
         reportes:[],
         usuario:[],
