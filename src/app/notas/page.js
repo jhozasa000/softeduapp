@@ -32,7 +32,16 @@ export default function Notas(){
 
             const tblHead = document.createElement("thead")
             const trhead = document.createElement('tr')
-            
+
+            const truser = document.createElement('tr')
+            const thheaduser = document.createElement('th')
+            thheaduser.setAttribute('colspan',12)
+            const cellText = document.createTextNode(`Estudiante ${no.idstunota}`);
+            thheaduser.appendChild(cellText);
+            truser.appendChild(thheaduser);
+
+            tblHead.appendChild(truser)
+            tbl.appendChild(tblHead)
 
             for(let f = 0;f < 12;f++){
                 const thhead = document.createElement('th')
