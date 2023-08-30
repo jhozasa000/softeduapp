@@ -12,7 +12,7 @@ export const Context = ({ children })  => {
         docentes:[
           {
             inp:'jhonnatan zapata',
-            inpcedula:'1130633993',
+            inpcedula:1130633993,
             inpPro:'sistemas',
             inptel:'3177168312',
             inpdir:'calle 20 norte',
@@ -22,6 +22,10 @@ export const Context = ({ children })  => {
         grados:[
           {
             inpG:'grado 1',
+            inpC:'calendario a',
+            inpJ:'tarde'
+          },{
+            inpG:'grado 2',
             inpC:'calendario a',
             inpJ:'tarde'
           }
@@ -48,7 +52,30 @@ export const Context = ({ children })  => {
             idgrade: 'grado 1 - calendario a - tarde'
           }
         ],
-        notas:[],
+        notas:[
+          {
+            idstunota:1130633993,
+            materias:[
+              [ "matematicas", 1, 4 , 3,6, 9 , 5, 4 , 3],
+              [ "sociales", 1, 5 , 4],
+              [ "español", 1, 5 , 2],
+              [ "matematicas", 2, 3 , 5, 8, 8],
+              [ "sociales", 2, 4 , 4],
+              [ "español", 2, 5 , 4],
+            ]
+          },
+          {
+            idstunota:1144,
+            materias:[
+              [ "matematicas", 1, 4 , 3,6, 9],
+              [ "sociales", 1, 5 , 4],
+              [ "español", 1, 5 , 2],
+              [ "matematicas", 2, 3 , 5, 8, 8],
+              [ "sociales", 2, 4 , 4],
+              [ "español", 2, 5 , 4],
+            ]
+          }
+        ],
         reportes:[],
         usuario:[],
         horarios:[],
