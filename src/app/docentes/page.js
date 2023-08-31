@@ -86,23 +86,11 @@ export default function Docentes(){
     const insertTeacher = () => {
 
         if(!inp.current.value  || !inpcedula.current.value  || !inpPro.current.value  || !inpTel.current.value  || !inpDir.current.value ){
-
-            console.log('inpcedula.current.value ', inpcedula.current.value);
-            console.log('inp.current.value ', inp.current.value);
-            console.log('inpPro.current.value ', inpPro.current.value);
-            console.log('inpTel.current.value ', inpTel.current.value);
-            console.log('inpDir.current.value ', inpDir.current.value);
-
             Alertas('Información','Los campos no pueden estar vacíos')
             return false
         }
        const id = inpcedula.current.value 
        const validate = datasite.docentes.filter((ele) =>{
-
-            console.log('ele.inpcedula   ',ele.inpcedula);
-            console.log('id  ', id);
-
-
             return ele.inpcedula == id
         })
  
@@ -128,8 +116,6 @@ export default function Docentes(){
         for (let pair of formdata.entries()) {
             obj[pair[0]] = pair[1]
         }
-
-        console.log('obj  ', obj);
 
         setDatasite((prevState) => ({...prevState,docentes:[
                 ...prevState.docentes,

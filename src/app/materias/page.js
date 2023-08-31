@@ -140,7 +140,7 @@ export default function Materias(){
                             <div className="row align-items-center justify-content-center">
                                 <label htmlFor="inputNomCourse" className="col-5 col-form-label col-form-label-sm fs-4 fw-bold">Nombre materia</label>
                                 <div className="col-6">
-                                    <input type="text" className="form-control " name='inputNomCourse' id="inputNomCourse"  ref={inputNomCourse}/>
+                                    <input type="text" className="form-control border-primary" name='inputNomCourse' id="inputNomCourse"  ref={inputNomCourse}/>
                                 </div>
                             </div>
                             <div className="text-center"> <button className='btn btn-primary my-3 ' onClick={insertCourse}>Insertar</button></div>
@@ -162,7 +162,7 @@ export default function Materias(){
                             <div className="row align-items-center justify-content-center my-2 card-body">
                                 <div className="col-sm-12 col-md-4">
                                     <div className="form-floating">
-                                        <select className="form-select" id="inpCl" ref={inpCl}>
+                                        <select className="form-select border-primary" id="inpCl" ref={inpCl}>
                                             <option key={0} value={''}>Selecciona materia</option>
                                             {fillcl}
                                         </select>
@@ -171,7 +171,7 @@ export default function Materias(){
                                 </div>
                                 <div className="col-sm-12 col-md-4">
                                     <div className="form-floating">
-                                        <select className="form-select" id="inpGra" ref={inpGra}>
+                                        <select className="form-select border-primary" id="inpGra" ref={inpGra}>
                                             <option key={0} value={''}>Selecciona grado</option>
                                             {fillpro}
                                         </select>
@@ -180,7 +180,7 @@ export default function Materias(){
                                 </div>
                                 <div className="col-sm-12 col-md-4">
                                     <div className="form-floating">
-                                        <select className="form-select" id="inpTeac" ref={inpTeac}>
+                                        <select className="form-select border-primary" id="inpTeac" ref={inpTeac}>
                                             <option key={0} value={''}>Selecciona docente</option>
                                             {filltea}
                                         </select>

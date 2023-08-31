@@ -87,13 +87,13 @@ export default function Grados(){
                             <div className="row align-items-center justify-content-center">
                                 <label htmlFor="inputNomCourse" className="col-5 col-form-label col-form-label-sm fs-4 fw-bold">Nombre grado</label>
                                 <div className="col-6">
-                                    <input type="text" className="form-control " name='inputNomCourse' id="inputNomCourse"  ref={inputNomCourse}/>
+                                    <input type="text" className="form-control border-primary" name='inputNomCourse' id="inputNomCourse"  ref={inputNomCourse}/>
                                 </div>
                             </div>
                             <div className="row align-items-center justify-content-center">
                                 <label htmlFor="inputNomCourse" className="col-5 col-form-label col-form-label-sm fs-4 fw-bold">Calendario</label>
                                 <div className="col-6">
-                                    <select className="form-select" ref={inputcal}>
+                                    <select className="form-select border-primary" ref={inputcal}>
                                         <option key={0} value={''}>Seleccione calendario</option>
                                         {fillcal}
                                     </select>
@@ -102,7 +102,7 @@ export default function Grados(){
                             <div className="row align-items-center justify-content-center">
                                 <label htmlFor="inputNomCourse" className="col-5 col-form-label col-form-label-sm fs-4 fw-bold">Jornada</label>
                                 <div className="col-6">
-                                    <select className="form-select" ref={inputjor}>
+                                    <select className="form-select border-primary" ref={inputjor}>
                                         <option key={0} value={''}>Seleccione jornada</option>
                                         {fillday}
                                     </select>

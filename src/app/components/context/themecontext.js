@@ -77,7 +77,12 @@ export const Context = ({ children })  => {
           }
         ],
         reportes:[],
-        usuario:[],
+        usuario:[
+          {
+            user:'admin',
+            passuser:'123'
+          }
+        ],
         horarios:[],
         profesion:['ingles','sistemas']
     });
