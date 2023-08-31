@@ -54,7 +54,7 @@ export default function Notas(){
                 }else if(f === 11){
                     text = 'Nota final'
                 }else{
-                    text = `Nota ${f}`
+                    text = `Nota ${f -1}`
                 }
                 const cellText = document.createTextNode(text);
                 thhead.appendChild(cellText);
@@ -101,9 +101,7 @@ export default function Notas(){
 
             })
 
-            console.log('no cedula  ', no.idstunota);
-
-            tbl.setAttribute('class', 'table table-bordered border-primary table-sm table-striped')
+            tbl.setAttribute('class', 'table table-bordered border-primary table-sm table-striped ')
             tbl.appendChild(tblBody)
             cont.appendChild(tbl)
 
@@ -131,10 +129,7 @@ export default function Notas(){
                         <div className="card h-100">
                             <h3 className="my-2 text-center">Notas</h3>
                                 <div className="container-fluid mt-5"> 
-                                    <div id="fillnote"></div>
-                                    <table className="table table-bordered border-primary table-sm table-striped">
-                                       
-                                    </table>
+                                    <div id="fillnote" className="table-responsive"></div>
                                 </div>
                         </div>
                     </div>
