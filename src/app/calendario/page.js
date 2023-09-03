@@ -25,6 +25,7 @@ export default function Calendario(){
     const [fillschoolday, setFillschoolday] = useState('');
     const [loadschoolday, setLoadschoolday] = useState(true);
     const [btncal, setBtncal] = useState('Insertar');
+    const [btnjor, setBtnjor] = useState('Insertar');
 
     useEffect(() => {
         setLoadcal(false)
@@ -208,15 +209,122 @@ export default function Calendario(){
 
     const loaddataschoolday = () =>{
 
-        setFillschoolday( datasite.jornada.map((ele,x) =>{
-             return <li key={x} className="list-group-item d-flex border-0 align-items-center justify-content-center">
-                        <div className="ms-2 me-auto ">
-                            <i className="bi bi-arrow-right-circle ms-3">{ele}</i>
-                        </div>
-                        <span><i className="bi bi-trash fs-4 px-2 text-danger"></i></span>
-                        <span><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></span>
-                    </li>
-        }))
+        Getdata('jornada/select').then((info)=>{
+            setFillschoolday( info.data.map(({id, name},x) =>{
+
+                const jornadadelete = (id) =>{
+                    const datos = {
+                        id:id
+                    }
+                    Swal.fire({
+                        title: `<strong>¿Desea eliminar: ${name}?</strong>`,
+                        showDenyButton: false,
+                        showCancelButton: true,
+                        confirmButtonText:'Eliminar',
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#3085d6',
+                        cancelButtonText:'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Putdata('jornada/delete',datos).then(res => {
+                                if(res?.data?.affectedRows > 0 ){
+                                    Alertas('Información',`Se eliminó la jornada ${name} del sistema`)
+                                    setLoadschoolday(true)
+                                }
+                            })
+                        } 
+                    })
+                }
+
+
+                return <li key={x} className="list-group-item d-flex border-0 align-items-center justify-content-center">
+                            <div className="ms-2 me-auto ">
+                                <i className="bi bi-arrow-right-circle ms-3">{name}</i>
+                            </div>
+                            <span><a onClick={() => jornadadelete(id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
+                            <span><a onClick={() => jornadaedit(info.data[x])}><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></a></span>
+                        </li>
+            }))
+        })  
+    }
+
+    const jornadaedit = ({id,name}) => {
+        setBtnjor("Actualizar")
+        inputNomSchoolday.current.value = name
+        const div = document.getElementById("btnjornada")
+        div.innerHTML = ""
+
+        const btnedit = document.createElement('button')
+        btnedit.setAttribute('class', 'btn btn-primary mx-3 my-3')
+        btnedit.innerText = "Actualizar"
+        btnedit.id = 'btn_insert_jor'
+        btnedit.name = 'btn_insert_jor'
+        btnedit.onclick = function() { jornadaupdate(id) }
+
+        const btncancel = document.createElement('button')
+        btncancel.setAttribute('class', 'btn btn-primary mx-3 my-3')
+        btncancel.innerText = "Cancelar"
+        btncancel.id = 'btn_cancel_sche'
+        btncancel.name = 'btn_cancel_sche'
+        btncancel.onclick = function() { jornadacancel() }
+
+        div.appendChild(btnedit)
+        div.appendChild(btncancel)
+
+    }
+
+    const jornadacancel = () => {
+        const div = document.getElementById("btnjornada")
+        div.innerHTML = ""
+
+        const btnedit = document.createElement('button')
+        btnedit.setAttribute('class', 'btn btn-primary my-3')
+        btnedit.innerText = "Insertar"
+        btnedit.id = 'btn_insert_jor'
+        btnedit.name = 'btn_insert_jor'
+        btnedit.onclick = function() { insertSchoolday() }
+        div.appendChild(btnedit)
+        setBtnjor('Insertar')
+        inputNomSchoolday.current.value = ''
+    }
+
+    const jornadaupdate = (id) => {
+        const value = inputNomSchoolday.current.value.trim()
+        if(!value){
+            Alertas('Información','El campo no puede estar vacío')
+            return false
+        }
+        const datos = {
+            name: value,
+            id:  id
+        }
+
+        Postdata('jornada/select',datos).then((ele) => {
+            if(ele?.data?.length){
+                Alertas('Información','Ya existe la jornada con ese nombre')
+                return false
+            }else{
+                Putdata('jornada/edit',datos).then((res) => {
+                    if(res?.data?.affectedRows > 0){
+                        const div = document.getElementById("btnjornada")
+                        div.innerHTML = ""
+
+                        const btnedit = document.createElement('button')
+                        btnedit.setAttribute('class', 'btn btn-primary my-3')
+                        btnedit.innerText = "Insertar"
+                        btnedit.id = 'btn_insert_jor'
+                        btnedit.name = 'btn_insert_jor'
+                        btnedit.onclick = function() { insertSchoolday() }
+                        div.appendChild(btnedit)
+                        setBtnjor('Insertar')
+                        Alertas('Información', `Se actualizo la jornada en el sistema`)
+                        inputNomSchoolday.current.value = ''
+                        setLoadschoolday(true)
+                        
+                    }
+                })
+            }
+        })
     }
 
     return(
@@ -247,14 +355,14 @@ export default function Calendario(){
                     {/* contenido jornada */}
                     <div className="col-sm-12 col-md-6 mb-2 ">
                         <div className="card h-100">
-                            <h3 className="my-2 text-center">Insertar jornada</h3>
+                            <h3 className="my-2 text-center">{btnjor} jornada</h3>
                                 <div className="row align-items-center justify-content-center">
                                     <label htmlFor="inputNomSchoolday" className="col-5 col-form-label col-form-label-sm fs-4 fw-bold">Nombre jornada</label>
                                     <div className="col-6">
                                         <input type="text" className="form-control border-primary" name='inputNomSchoolday' id="inputNomSchoolday"  ref={inputNomSchoolday}/>
                                     </div>
                                 </div>
-                               <div className="text-center"> <button className='btn btn-primary my-3 ' name="btn_insert_jor" id="btn_insert_jor" onClick={insertSchoolday}>Insertar</button></div>
+                               <div className="text-center" id="btnjornada"> <button className='btn btn-primary my-3 ' name="btn_insert_jor" id="btn_insert_jor" onClick={insertSchoolday}>Insertar</button></div>
                         </div>
                     </div>
                     <div className="col-sm-12 col-md-6 mb-2 ">
