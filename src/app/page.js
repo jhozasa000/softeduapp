@@ -6,17 +6,13 @@ import logo from '../../public/logo.png'
 import { useRef } from 'react';
 import { useRouter} from 'next/navigation' 
 import { Alertas } from './components/functions/helpers';
+import { Postdata } from './components/functions/Postdata';
 
 export default function Login() {
 
   const inputuser = useRef(null);
   const inputpass = useRef(null);
   const router = useRouter()
-  const { datasite, setDatasite } = Reducer();
-  const data = {
-    user:'admin',
-    pass:'123'
-  }
 
   const login = () => {
     const inpUser = inputuser.current.value
@@ -27,16 +23,22 @@ export default function Login() {
       return false
     }
 
-    if(data.user === inpUser && data.pass === inpPass){
-      setDatasite({
-        ...datasite,
-        user: inpUser
-        })
-      router.push('/home')
-    }else{
-      Alertas( 'Información' ,'Validar los campos ingresados')
-      return false
+    const datos = {
+      user:inpUser,
+      pass:inpPass
     }
+
+    Postdata('login',datos).then((ele) => {
+      if(ele.data.length){
+        localStorage.setItem('datauser',JSON.stringify(ele.data))         
+        router.push('/home')
+      }else{
+        Alertas( 'Información' ,'Validar datos ingresados')
+        return false
+      }
+    })
+
+   
   }
 
   return (

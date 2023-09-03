@@ -1,8 +1,14 @@
 "use client"
 import { Reducer } from "../components/context/themecontext";
+import { Getdata } from "../components/functions/Getdata";
+import { Postdata } from "../components/functions/Postdata";
+import { Putdata } from "../components/functions/Putdata";
 import { Alertas } from "../components/functions/helpers";
 import Menu from "../components/menu/Menu"
 import { useEffect, useRef, useState } from 'react';
+import Swal from 'sweetalert2';
+import { createContext } from 'react';
+
 
  const metadata = {
     title: 'Calendario',
@@ -18,6 +24,7 @@ export default function Calendario(){
     const [fillcall, setFillcall] = useState('');
     const [fillschoolday, setFillschoolday] = useState('');
     const [loadschoolday, setLoadschoolday] = useState(true);
+    const [btncal, setBtncal] = useState('Insertar');
 
     useEffect(() => {
         setLoadcal(false)
@@ -29,43 +36,148 @@ export default function Calendario(){
         loaddataschoolday()
     }, [loadschoolday]);
 
-    
-
     const insertSchedule = () =>{
         const inpNomCal = inputNomCal.current.value.trim()
         if(!inpNomCal){
             Alertas('Información','El campo no puede estar vacío')
             return false
         }
-
-       const validate = datasite.calendario.filter((ele) =>{
-            return ele == inpNomCal
-        })
-
-        if(validate.length){
-            Alertas('Información','Ya existe el calendario')
-            return false
+        const datos = {
+            name:inpNomCal,
         }
-
-       setDatasite((prevState) => ({...prevState,calendario:[
-                ...prevState.calendario,
-                inpNomCal,
-        ]}))
-        inputNomCal.current.value = ''
-        setLoadcal(true)
+        Postdata('calendario/select',datos).then((ele) => {
+            if(ele?.data?.length){
+                Alertas('Información','Ya existe el calendario')
+                return false
+            }else{
+                Postdata('calendario/insert',datos).then((res) => {
+                    if(res?.data?.affectedRows > 0){
+                        Alertas('Información', `Se inserto el calendario en el sistema`)
+                        inputNomCal.current.value = ''
+                        setLoadcal(true)
+                    }
+                })
+            }
+          })
     }
 
     const loaddata = () =>{
+        Getdata('calendario/select').then((info)=>{
+            setFillcall( info.data.map(({id, name},x) =>{
 
-        setFillcall( datasite.calendario.map((ele,x) =>{
-             return <li key={x} className="list-group-item d-flex border-0 align-items-center justify-content-center">
-             <div className="ms-2 me-auto ">
-                 <i className="bi bi-arrow-right-circle ms-3">{ele}</i>
-             </div>
-             <span><i className="bi bi-trash fs-4 px-2 text-danger"></i></span>
-             <span><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></span>
-         </li>
-        }))
+                const calendariodelete = (id) =>{
+                    const datos = {
+                        id:id
+                    }
+                    Swal.fire({
+                        title: `<strong>¿Desea eliminar: ${name}?</strong>`,
+                        showDenyButton: false,
+                        showCancelButton: true,
+                        confirmButtonText:'Eliminar',
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#3085d6',
+                        cancelButtonText:'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Putdata('calendario/delete',datos).then(res => {
+                                if(res?.data?.affectedRows > 0 ){
+                                    Alertas('Información',`Se eliminó el ${name} del sistema`)
+                                    setLoadcal(true)
+                                }
+                            })
+                        } 
+                    })
+                }
+
+
+                return <li key={x} className="list-group-item d-flex border-0 align-items-center justify-content-center">
+                            <div className="ms-2 me-auto ">
+                                <i className="bi bi-arrow-right-circle ms-3">{name}</i>
+                            </div>
+                            <span><a onClick={() => calendariodelete(id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
+                            <span><a onClick={() => calendarioedit(info.data[x])}><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></a></span>
+                        </li>
+            }))
+        })   
+    }
+
+    const calendarioedit = ({id,name}) => {
+        setBtncal("Actualizar")
+        inputNomCal.current.value = name
+        const div = document.getElementById("btncalchange")
+        div.innerHTML = ""
+
+        const btnedit = document.createElement('button')
+        btnedit.setAttribute('class', 'btn btn-primary mx-3 my-3')
+        btnedit.innerText = "Actualizar"
+        btnedit.id = 'btn_insert_sche'
+        btnedit.name = 'btn_insert_sche'
+        btnedit.onclick = function() { calendarioupdate(id) }
+
+        const btncancel = document.createElement('button')
+        btncancel.setAttribute('class', 'btn btn-primary mx-3 my-3')
+        btncancel.innerText = "Cancelar"
+        btncancel.id = 'btn_cancel_sche'
+        btncancel.name = 'btn_cancel_sche'
+        btncancel.onclick = function() { calendariocancel() }
+
+        div.appendChild(btnedit)
+        div.appendChild(btncancel)
+
+    }
+
+    const calendariocancel = () => {
+        const div = document.getElementById("btncalchange")
+        div.innerHTML = ""
+
+        const btnedit = document.createElement('button')
+        btnedit.setAttribute('class', 'btn btn-primary my-3')
+        btnedit.innerText = "Insertar"
+        btnedit.id = 'btn_insert_sche'
+        btnedit.name = 'btn_insert_sche'
+        btnedit.onclick = function() { insertSchedule() }
+        div.appendChild(btnedit)
+        setBtncal('Insertar')
+        inputNomCal.current.value = ''
+    }
+
+    const calendarioupdate = (id) => {
+        const value = inputNomCal.current.value.trim()
+        if(!value){
+            Alertas('Información','El campo no puede estar vacío')
+            return false
+        }
+        const datos = {
+            name: value,
+            id:  id
+        }
+
+        Postdata('calendario/select',datos).then((ele) => {
+            if(ele?.data?.length){
+                Alertas('Información','Ya existe el calendario con ese nombre')
+                return false
+            }else{
+                Putdata('calendario/edit',datos).then((res) => {
+                    if(res?.data?.affectedRows > 0){
+                        const div = document.getElementById("btncalchange")
+                        div.innerHTML = ""
+
+                        const btnedit = document.createElement('button')
+                        btnedit.setAttribute('class', 'btn btn-primary my-3')
+                        btnedit.innerText = "Insertar"
+                        btnedit.id = 'btn_insert_sche'
+                        btnedit.name = 'btn_insert_sche'
+                        btnedit.onclick = function() { insertSchedule() }
+                        div.appendChild(btnedit)
+                        setBtncal('Insertar')
+                        Alertas('Información', `Se actualizo el calendario en el sistema`)
+                        inputNomCal.current.value = ''
+                        setLoadcal(true)
+                        
+                    }
+                })
+            }
+        })
     }
 
     const insertSchoolday = () =>{
@@ -74,21 +186,24 @@ export default function Calendario(){
             Alertas('Información','El campo no puede estar vacío')
             return false
         }
-        const validate = datasite.jornada.filter((ele) =>{
-            return ele == inpNonSchoolday
-        })
 
-        if(validate.length){
-            Alertas('Información','Ya existe la jornada')
-            return false
+        const datos = {
+            name:inpNonSchoolday,
         }
-        setDatasite((prevState) => ({...prevState,jornada:[
-            ...prevState.jornada,
-            inpNonSchoolday,
-        ]}))
-        inputNomSchoolday.current.value = ''
-        setLoadschoolday(true)
-
+        Postdata('jornada/select',datos).then((ele) => {
+            if(ele?.data?.length){
+                Alertas('Información','Ya existe la jornada')
+                return false
+            }else{
+                Postdata('jornada/insert',datos).then((res) => {
+                    if(res?.data?.affectedRows > 0){
+                        Alertas('Información', `Se inserto la jornada en el sistema`)
+                        inputNomSchoolday.current.value = ''
+                        setLoadschoolday(true)
+                    }
+                })
+            }
+          })
     }
 
     const loaddataschoolday = () =>{
@@ -111,14 +226,14 @@ export default function Calendario(){
                 <div className="row ">
                     <div className="col-sm-12 col-md-6 mb-2 ">
                         <div className="card h-100">
-                            <h3 className="my-2 text-center">Insertar calendario</h3>
+                            <h3 className="my-2 text-center">{btncal} calendario</h3>
                                 <div className="row align-items-center justify-content-center">
                                     <label htmlFor="inputNomCal" className="col-5 col-form-label col-form-label-sm fs-4 fw-bold">Nombre calendario</label>
                                     <div className="col-6">
                                         <input type="text" className="form-control border-primary" name='inputNomCal' id="inputNomCal"  ref={inputNomCal}/>
                                     </div>
                                 </div>
-                               <div className="text-center"> <button className='btn btn-primary my-3 ' name="btn_insert_sche" id="btn_insert_sche" onClick={insertSchedule}>Insertar</button></div>
+                               <div className="text-center" id="btncalchange"> <button className='btn btn-primary my-3 ' name="btn_insert_sche" id="btn_insert_sche" onClick={insertSchedule}>Insertar</button></div>
                         </div>
                     </div>
                     <div className="col-sm-12 col-md-6 mb-2 ">
