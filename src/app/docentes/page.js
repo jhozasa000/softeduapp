@@ -1,8 +1,13 @@
 "use client"
 import { Reducer } from "../components/context/themecontext";
+import { Getdata } from "../components/functions/Getdata";
+import { Postdata } from "../components/functions/Postdata";
+import { Putdata } from "../components/functions/Putdata";
 import { Alertas } from "../components/functions/helpers";
 import Menu from "../components/menu/Menu"
-import { use, useEffect, useReducer, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import Swal from 'sweetalert2';
+
 
 const metadata = {
     title: 'Docentes',
@@ -25,6 +30,7 @@ export default function Docentes(){
     const [fillcarr, setfillcarr] = useState('');
     const [fillteacher, setFillteacher] = useState('');
     const [loadteacher, setLoadteacher] = useState(true);
+    const [btnpro, setBtnpro] = useState('Insertar');
 
     useEffect(() => {
         setLoadpro(false)
@@ -43,42 +49,151 @@ export default function Docentes(){
             Alertas('Información','El campo no puede estar vacío')
             return false
         }
-        const validate = datasite.profesion.filter((ele) =>{
-            return ele == inpNomPro
-        })
-
-        if(validate.length){
-            Alertas('Información','Ya existe la profesión')
-            return false
+        const datos = {
+            name:inpNomPro,
         }
-
-       setDatasite((prevState) => ({...prevState,profesion:[
-                ...prevState.profesion,
-                inpNomPro,
-        ]}))
-        inputNomProfesion.current.value = ''
-        setLoadpro(true)
+        Postdata('profesion/select',datos).then((ele) => {
+            if(ele?.data?.length){
+                Alertas('Información','Ya existe la profesion')
+                return false
+            }else{
+                Postdata('profesion/insert',datos).then((res) => {
+                    if(res?.data?.affectedRows > 0){
+                        Alertas('Información', `Se inserto la profesion en el sistema`)
+                        inputNomProfesion.current.value = ''
+                        setLoadpro(true)
+                    }
+                })
+            }
+          })
     }
 
     const loaddata = () =>{
+        Getdata('profesion/select').then((info)=>{
+            setFillpro( info.data.map(({id, name},x) =>{
 
-        setFillpro( datasite.profesion.map((ele,x) =>{
-             return <li key={x} className="list-group-item d-flex border-0 align-items-center justify-content-center">
-                        <div className="ms-2 me-auto ">
-                            <i className="bi bi-arrow-right-circle ms-3">{ele}</i>
-                        </div>
-                        <span><i className="bi bi-trash fs-4 px-2 text-danger"></i></span>
-                        <span><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></span>
-                    </li>
-        }))
+                const profesiondelete = (id) =>{
+                    const datos = {
+                        id:id
+                    }
+                    Swal.fire({
+                        title: `<strong>¿Desea eliminar: ${name}?</strong>`,
+                        showDenyButton: false,
+                        showCancelButton: true,
+                        confirmButtonText:'Eliminar',
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#3085d6',
+                        cancelButtonText:'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Putdata('profesion/delete',datos).then(res => {
+                                if(res?.data?.affectedRows > 0 ){
+                                    Alertas('Información',`Se eliminó la profesión ${name} del sistema`)
+                                    setLoadpro(true)
+                                }
+                            })
+                        } 
+                    })
+                }
+
+
+                return <li key={x} className="list-group-item d-flex border-0 align-items-center justify-content-center">
+                            <div className="ms-2 me-auto ">
+                                <i className="bi bi-arrow-right-circle ms-3">{name}</i>
+                            </div>
+                            <span><a onClick={() => profesiondelete(id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
+                            <span><a onClick={() => profesionedit(info.data[x])}><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></a></span>
+                        </li>
+            }))
+        })   
+    }
+
+    const profesionedit = ({id,name}) => {
+        setBtnpro("Actualizar")
+        inputNomProfesion.current.value = name
+        const div = document.getElementById("btnprochange")
+        div.innerHTML = ""
+
+        const btnedit = document.createElement('button')
+        btnedit.setAttribute('class', 'btn btn-primary mx-3 my-3')
+        btnedit.innerText = "Actualizar"
+        btnedit.id = 'btn_insert_sche'
+        btnedit.name = 'btn_insert_sche'
+        btnedit.onclick = function() { profesionupdate(id) }
+
+        const btncancel = document.createElement('button')
+        btncancel.setAttribute('class', 'btn btn-primary mx-3 my-3')
+        btncancel.innerText = "Cancelar"
+        btncancel.id = 'btn_cancel_sche'
+        btncancel.name = 'btn_cancel_sche'
+        btncancel.onclick = function() { profesioncancel() }
+
+        div.appendChild(btnedit)
+        div.appendChild(btncancel)
+
+    }
+
+    const profesioncancel = () => {
+        const div = document.getElementById("btnprochange")
+        div.innerHTML = ""
+
+        const btnedit = document.createElement('button')
+        btnedit.setAttribute('class', 'btn btn-primary my-3')
+        btnedit.innerText = "Insertar"
+        btnedit.id = 'btn_insert_sche'
+        btnedit.name = 'btn_insert_sche'
+        btnedit.onclick = function() { insertBachelor() }
+        div.appendChild(btnedit)
+        setBtnpro('Insertar')
+        inputNomProfesion.current.value = ''
+    }
+
+    const profesionupdate = (id) => {
+        const value = inputNomProfesion.current.value.trim()
+        if(!value){
+            Alertas('Información','El campo no puede estar vacío')
+            return false
+        }
+        const datos = {
+            name: value,
+            id:  id
+        }
+
+        Postdata('profesion/select',datos).then((ele) => {
+            if(ele?.data?.length){
+                Alertas('Información','Ya existe el profesion con ese nombre')
+                return false
+            }else{
+                Putdata('profesion/edit',datos).then((res) => {
+                    if(res?.data?.affectedRows > 0){
+                        const div = document.getElementById("btnprochange")
+                        div.innerHTML = ""
+
+                        const btnedit = document.createElement('button')
+                        btnedit.setAttribute('class', 'btn btn-primary my-3')
+                        btnedit.innerText = "Insertar"
+                        btnedit.id = 'btn_insert_sche'
+                        btnedit.name = 'btn_insert_sche'
+                        btnedit.onclick = function() { insertBachelor() }
+                        div.appendChild(btnedit)
+                        setBtnpro('Insertar')
+                        Alertas('Información', `Se actualizo la profesion en el sistema`)
+                        inputNomProfesion.current.value = ''
+                        setLoadpro(true)
+                        
+                    }
+                })
+            }
+        })
     }
 
     const fillcareers = () => {
-        const fillselect = datasite.profesion
-        setfillcarr(fillselect.map((ele,x) => {
-            return <option key={x+1} value={ele}>{ele}</option>
-            })
-        )
+        Getdata('profesion/select').then((info)=>{
+            setfillcarr( info.data.map(({id, name},x) =>{
+                return <option key={x+1} value={id}>{name}</option>
+
+            }))
+        })
     }
 
     
@@ -145,14 +260,14 @@ export default function Docentes(){
                 <div className="row">
                     <div className="col-sm-12 col-md-6 mb-2" >
                         <div className="card h-100">
-                            <h3 className="my-2 text-center">Insertar profesión</h3>
+                            <h3 className="my-2 text-center">{btnpro} profesión</h3>
                             <div className="row align-items-center justify-content-center">
                                     <label htmlFor="inputNomProfesion" className="col-5 col-form-label col-form-label-sm fs-4 fw-bold">Nombre profesión</label>
                                     <div className="col-6">
                                         <input type="text" className="form-control border-primary" name='inputNomProfesion' id="inputNomProfesion"  ref={inputNomProfesion}/>
                                     </div>
                                 </div>
-                               <div className="text-center"> <button className='btn btn-primary my-3 ' onClick={insertBachelor}>Insertar</button></div>
+                               <div className="text-center" id="btnprochange"> <button className='btn btn-primary my-3 ' onClick={insertBachelor}>Insertar</button></div>
                         </div>
                         
                     </div>
