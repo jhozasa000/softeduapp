@@ -326,6 +326,9 @@ export default function Calendario(){
                         inputNomSchoolday.current.value = ''
                         setLoadschoolday(true)
                         
+                    }else if(res?.data?.error){
+                        Alertas('Información', res.data.error)
+                        return false
                     }
                 })
             }
