@@ -226,7 +226,7 @@ export default function Docentes(){
                 Postdata('docentes/insert',formdata).then((res) => {
 
                     if(res?.data?.error){
-                        Alertas('Información',ele?.data?.error)
+                        Alertas('Información',res?.data?.error)
                     }
 
                     if(res?.data?.affectedRows > 0){
@@ -403,6 +403,7 @@ export default function Docentes(){
         formdata.append(`filesbd`, files);
      
         Putdata('docentes/edit',formdata).then((res) => {
+
             if(res?.data?.affectedRows > 0){
                 const div = document.getElementById("btntea")
                 div.innerHTML = ""
@@ -426,6 +427,9 @@ export default function Docentes(){
                 inpFile.current.value = ''
                 setLoadteacher(true)
                 
+            }else if(res?.data?.error){
+                Alertas('Información', res.data.error)
+                return false
             }
         })
     }

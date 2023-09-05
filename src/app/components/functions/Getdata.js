@@ -7,6 +7,7 @@ const Getdata = async (urlback) => {
       return response
     } catch (error) {
       console.error(error);
+      return error
     }
   }
 

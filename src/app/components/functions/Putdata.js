@@ -7,6 +7,7 @@ const Putdata = async (urlback,datos) => {
       return response
     } catch (error) {
       console.error(error);
+      return error
     }
   }
 

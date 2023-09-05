@@ -1,12 +1,14 @@
 "use client"
+import { Getdata } from "../components/functions/Getdata";
 import { Reducer } from "../components/context/themecontext";
 import { Alertas } from "../components/functions/helpers";
 import Menu from "../components/menu/Menu"
 import { useEffect, useRef, useState } from 'react';
+import { Postdata } from "../components/functions/Postdata";
 
 const metadata = {
-    title: 'Docentes',
-    description: 'Docentes',
+    title: 'grados',
+    description: 'grados',
   }
 
 export default function Grados(){    
@@ -15,63 +17,77 @@ export default function Grados(){
     const inputcal = useRef(null);
     const inputjor = useRef(null);
     const { datasite, setDatasite } = Reducer();
-    const [loadcourse, setLoadcourse] = useState(true);
+    const [loadcourse, setLoadcourse] = useState(false);
     const [fillcor, setFillcor] = useState('');
     const [fillcal, setFillcal] = useState(true);
     const [fillday, setFillday] = useState(true);
 
     useEffect(() => {
-        setLoadcourse(false)
-        loaddata()
-        setFillcal(datasite.calendario.map((ele,key) => { return <option key={key+1} value={ele}>{ele}</option>}))
-        setFillday(datasite.jornada.map((ele,key) => { return <option key={key+1} value={ele}>{ele}</option>}))
+            Getdata('calendario/select').then((info)=>{
+                setFillcal( info.data.map(({id, name},x) =>{
+                    return <option key={x+1} value={id}>{name}</option>
+
+                }))
+            })
+
+            Getdata('jornada/select').then((info)=>{
+                setFillday( info.data.map(({id, name},x) =>{
+                    return <option key={x+1} value={id}>{name}</option>
+
+                }))
+            })
+            loaddata()
     }, [loadcourse]);
 
     const insertCourse = () =>{
         const inpGr = inputNomCourse.current.value.trim()
-        const inpCa = inputcal.current.value
         const inpJo = inputjor.current.value
-
-        if(!inpGr|| !inpCa || !inpJo){
-            Alertas('Información','Los campos no pueden estar vacíos')
+        const inpCa = inputcal.current.value
+        
+        if(!inpGr || !inpCa || !inpJo){
+            Alertas('Información','El campo no puede estar vacío')
             return false
         }
-        const validate = datasite.grados.filter(({inpG,inpC, inpJ}) =>{
-            return inpGr == inpG && inpCa == inpC &&  inpJo == inpJ
-        })
-
-        if(validate.length){
-            Alertas('Información','Ya existe el grado')
-            return false
+        const datos = {
+            name:inpGr,
+            idcal:inpCa,
+            idjor:inpJo
         }
-        const obj = new Object();
-        obj['inpG'] = inpGr
-        obj['inpC'] = inpCa
-        obj['inpJ'] = inpJo
 
+        console.log('datos  :: ', datos);
 
-       setDatasite((prevState) => ({...prevState,grados:[
-                ...prevState.grados,
-                obj,
-        ]}))
-        inputNomCourse.current.value = ''
-        inputcal.current.value = ''
-        inputjor.current.value = ''
-        setLoadcourse(true)
+        Postdata('grados/select',datos).then((ele) => {
+            if(ele?.data?.length){
+                Alertas('Información','Ya existe el grado')
+                return false
+            }else{
+                Postdata('grados/insert',datos).then((res) => {
+                    if(res?.data?.affectedRows > 0){
+                        Alertas('Información', `Se inserto el grado en el sistema`)
+                        inputNomCourse.current.value = ''
+                        inputjor.current.value = ''
+                        inputcal.current.value = ''
+                        setLoadcourse(true)
+                    }
+                })
+            }
+          })
     }
 
     const loaddata = () =>{
 
-        setFillcor( datasite.grados.map(({inpG,inpC,inpJ},x) =>{
-             return <li key={x} className="list-group-item d-flex border-0 align-items-center justify-content-center">
+        Getdata('grados/select').then((info)=>{
+            setFillcor( info.data.map(({idgra, namegra,namecal,namejor},x) =>{
+                return <li key={x} className="list-group-item d-flex border-0 align-items-center justify-content-center">
                         <div className="ms-2 me-auto">
-                                <div className='text-primary fw-bold'>{inpG}</div>
-                                    <i className="bi bi-arrow-right-circle ms-3">{inpC} - {inpJ}</i>
+                                <div className='text-primary fw-bold'>{namegra}</div>
+                                    <i className="bi bi-arrow-right-circle ms-3">{namecal} - {namejor}</i>
                             </div>
                         <span><i className="bi bi-trash fs-4 px-2 text-danger"></i></span>
                         <span><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></span>
                     </li>
-        }))
+            }))
+        })
     }
 
 

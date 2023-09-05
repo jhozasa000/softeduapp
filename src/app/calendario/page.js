@@ -27,13 +27,13 @@ export default function Calendario(){
     const [btnjor, setBtnjor] = useState('Insertar');
 
     useEffect(() => {
-        setLoadcal(false)
         loaddata()
+        setLoadcal(false)
     }, [loadcal]);
 
     useEffect(() => {
-        setLoadschoolday(false)
         loaddataschoolday()
+        setLoadschoolday(false)
     }, [loadschoolday]);
 
     const insertSchedule = () =>{
@@ -55,6 +55,9 @@ export default function Calendario(){
                         Alertas('Información', `Se inserto el calendario en el sistema`)
                         inputNomCal.current.value = ''
                         setLoadcal(true)
+                    }else if(res?.data?.error){
+                        Alertas('Información', res.data.error)
+                        return false
                     }
                 })
             }
@@ -174,6 +177,9 @@ export default function Calendario(){
                         inputNomCal.current.value = ''
                         setLoadcal(true)
                         
+                    }else if(res?.data?.error){
+                        Alertas('Información', res.data.error)
+                        return false
                     }
                 })
             }
