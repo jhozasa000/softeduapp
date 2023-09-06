@@ -1,8 +1,12 @@
 "use client"
 import { Reducer } from "../components/context/themecontext";
+import { Getdata } from "../components/functions/Getdata";
+import { Postdata } from "../components/functions/Postdata";
+import { Putdata } from "../components/functions/Putdata";
 import { Alertas } from "../components/functions/helpers";
 import Menu from "../components/menu/Menu"
 import { useEffect, useRef, useState } from 'react';
+import  Swal  from 'sweetalert2';
 
 const metadata = {
     title: 'Materias',
@@ -23,10 +27,13 @@ export default function Materias(){
     const [filltea, setFilltea] = useState('');
     const [fillrela, setFillrela] = useState('');
     const [loadrela, setLoadrela] = useState(true);
+    const [btnpro, setBtnpro] = useState('Insertar');
+
 
     useEffect(() => {
         setLoadsubject(false)
         loaddata()
+        filldatarelationship()
     }, [loadsubject]);
 
     useEffect(() => {
@@ -40,47 +47,167 @@ export default function Materias(){
             Alertas('Información','El campo no puede estar vacío')
             return false
         }
-        const validate = datasite.materias.filter((ele) =>{
-            return ele == inpNomPro
-        })
+        const datos = {
+            name:inpNomPro,
+        }
+        Postdata('materias/select',datos).then((ele) => {
+            if(ele?.data?.length){
+                Alertas('Información','Ya existe la materias')
+                return false
+            }else{
+                Postdata('materias/insert',datos).then((res) => {
+                    if(res?.data?.affectedRows > 0){
+                        Alertas('Información', `Se inserto la materias en el sistema`)
+                        inputNomCourse.current.value = ''
+                        setLoadsubject(true)
+                    }else if(res?.data?.error){
+                        Alertas('Información', res.data.error)
+                        return false
+                    }
+                })
+            }
+          })
+    }
+    const loaddata = () =>{
+        Getdata('materias/select').then((info)=>{
+            setFillcor( info.data.map(({id, name},x) =>{
 
-        if(validate.length){
-            Alertas('Información','Ya existe la materia')
+                const materiasdelete = (id) =>{
+                    const datos = {
+                        id:id
+                    }
+                    Swal.fire({
+                        title: `<strong>¿Desea eliminar: ${name}?</strong>`,
+                        showDenyButton: false,
+                        showCancelButton: true,
+                        confirmButtonText:'Eliminar',
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#3085d6',
+                        cancelButtonText:'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Putdata('materias/delete',datos).then(res => {
+                                if(res?.data?.affectedRows > 0 ){
+                                    Alertas('Información',`Se eliminó la ${name} del sistema`)
+                                    setLoadsubject(true)
+                                }
+                            })
+                        } 
+                    })
+                }
+
+
+                return <li key={x} className="list-group-item d-flex border-0 align-items-center justify-content-center">
+                            <div className="ms-2 me-auto ">
+                                <i className="bi bi-arrow-right-circle ms-3">{name}</i>
+                            </div>
+                            <span><a onClick={() => materiasdelete(id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
+                            <span><a onClick={() => materiasedit(info.data[x])}><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></a></span>
+                        </li>
+            }))
+        })   
+    }
+
+    const materiasedit = ({id,name}) => {
+        setBtnpro("Actualizar")
+        inputNomCourse.current.value = name
+        const div = document.getElementById("btncoursechange")
+        div.innerHTML = ""
+
+        const btnedit = document.createElement('button')
+        btnedit.setAttribute('class', 'btn btn-primary mx-3 my-3')
+        btnedit.innerText = "Actualizar"
+        btnedit.id = 'btn_insert_sche'
+        btnedit.name = 'btn_insert_sche'
+        btnedit.onclick = function() { materiasupdate(id) }
+
+        const btncancel = document.createElement('button')
+        btncancel.setAttribute('class', 'btn btn-primary mx-3 my-3')
+        btncancel.innerText = "Cancelar"
+        btncancel.id = 'btn_cancel_sche'
+        btncancel.name = 'btn_cancel_sche'
+        btncancel.onclick = function() { materiascancel() }
+
+        div.appendChild(btnedit)
+        div.appendChild(btncancel)
+
+    }
+
+    const materiascancel = () => {
+        const div = document.getElementById("btncoursechange")
+        div.innerHTML = ""
+
+        const btnedit = document.createElement('button')
+        btnedit.setAttribute('class', 'btn btn-primary my-3')
+        btnedit.innerText = "Insertar"
+        btnedit.id = 'btn_insert_sche'
+        btnedit.name = 'btn_insert_sche'
+        btnedit.onclick = function() { insertCourse() }
+        div.appendChild(btnedit)
+        setBtnpro('Insertar')
+        inputNomCourse.current.value = ''
+    }
+
+    const materiasupdate = (id) => {
+        const value = inputNomCourse.current.value.trim()
+        if(!value){
+            Alertas('Información','El campo no puede estar vacío')
             return false
         }
+        const datos = {
+            name: value,
+            id:  id
+        }
 
-       setDatasite((prevState) => ({...prevState,materias:[
-                ...prevState.materias,
-                inpNomPro,
-        ]}))
-        inputNomCourse.current.value = ''
-        setLoadsubject(true)
+        Postdata('materias/select',datos).then((ele) => {
+            if(ele?.data?.length){
+                Alertas('Información','Ya existe el materias con ese nombre')
+                return false
+            }else{
+                Putdata('materias/edit',datos).then((res) => {
+                    if(res?.data?.affectedRows > 0){
+                        const div = document.getElementById("btncoursechange")
+                        div.innerHTML = ""
+
+                        const btnedit = document.createElement('button')
+                        btnedit.setAttribute('class', 'btn btn-primary my-3')
+                        btnedit.innerText = "Insertar"
+                        btnedit.id = 'btn_insert_sche'
+                        btnedit.name = 'btn_insert_sche'
+                        btnedit.onclick = function() { insertCourse() }
+                        div.appendChild(btnedit)
+                        setBtnpro('Insertar')
+                        Alertas('Información', `Se actualizo la materias en el sistema`)
+                        inputNomCourse.current.value = ''
+                        setLoadsubject(true)
+                        
+                    }else if(res?.data?.error){
+                        Alertas('Información', res.data.error)
+                        return false
+                    }
+                })
+            }
+        })
     }
 
-    const loaddata = () =>{
-
-        setFillcor( datasite.materias.map((ele,x) =>{
-             return <li key={x} className="list-group-item d-flex border-0 align-items-center justify-content-center">
-                        <div className="ms-2 me-auto">
-                            <i className="bi bi-arrow-right-circle ms-3">{ele}</i>
-                        </div>
-                        <span><i className="bi bi-trash fs-4 px-2 text-danger"></i></span>
-                        <span><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></span>
-                    </li>
-        }))
-        filldatarelationship()
-    }
 
     const filldatarelationship = () => {
-        setFillcl( datasite.materias.map((ele,x) =>{
-            return <option key={x+1} value={ele}>{ele}</option>
-        }))
-       setFillpro( datasite.grados.map(({inpG,inpC,inpJ},x) =>{
-        return <option key={x+1} value={inpG +' - '+ inpC  +' - '+ inpJ}>{inpG +' - '+ inpC  +' - '+ inpJ}</option>
-        }))
-        setFilltea( datasite.docentes.map(({inp,inpPro},x) =>{
-            return <option key={x+1} value={inp +' - '+ inpPro}>{inp +' - '+ inpPro}</option>
-        }))
+        Getdata('materias/select').then((info)=>{
+            setFillcl( info.data.map(({id, name},x) =>{
+                return <option key={x+1} value={id}>{name}</option>
+            }))
+        })
+        Getdata('grados/select').then((info)=>{
+            setFillpro( info.data.map(({idgra, namegra,namecal,namejor},x) =>{
+                return <option key={x+1} value={idgra}>{namegra +' - '+ namecal  +' - '+ namejor}</option>
+            }))
+        })
+        Getdata('docentes/select').then((info)=>{
+            setFilltea( info.data.map(({id,name,numberid,profession},x) =>{
+                return <option key={x+1} value={id}>{name +' - '+ numberid +' - '+ profession}</option>
+            }))
+        })
+        
     }
 
     const insertRelationship = () =>{
@@ -93,39 +220,165 @@ export default function Materias(){
             return false
         }
 
-        const validate = datasite.materiasrelaion.filter(({inpm,inpg,inpd}) =>{
-            return inpm == inpmD && inpg == inpgD && inpd == inpdD
-        })
-
-        if(validate.length){
-            Alertas('Información','Ya existe la relación')
-            return false
+        const datos = {
+            idm:inpmD,
+            idg:inpgD,
+            idd:inpdD,
         }
 
-        const obj = new Object()
-        obj['inpm'] = inpmD
-        obj['inpg'] = inpgD
-        obj['inpd'] = inpdD
-
-        setDatasite((prevState) => ({...prevState,materiasrelaion:[
-            ...prevState.materiasrelaion,
-            obj,
-        ]}))
-        setLoadrela(true)
+        Postdata('materiasrelacion/select',datos).then((ele) => {
+            if(ele?.data?.length){
+                Alertas('Información','Ya existe la relación')
+                return false
+            }else{
+                Postdata('materiasrelacion/insert',datos).then((res) => {
+                    if(res?.data?.affectedRows > 0){
+                        Alertas('Información', `Se inserto la relación en el sistema`)
+                        inpCl.current.value = ''
+                        inpGra.current.value = ''
+                        inpTeac.current.value = ''
+                        setLoadrela(true)
+                    }else if(res?.data?.error){
+                        Alertas('Información', res.data.error)
+                        return false
+                    }
+                })
+            }
+          })
     }
 
     const loadrel = () =>{
-        setFillrela(datasite.materiasrelaion.map(({inpm,inpg,inpd},x) => {
-            return <li key={x} className="list-group-item d-flex border-0 align-items-center justify-content-center">
-                        <div className="ms-2 me-auto">
-                                <div className='text-primary fw-bold'>{inpg} - {inpd}</div>
-                                    <i className="bi bi-arrow-right-circle ms-3">{inpm}</i>
+        Getdata('materiasrelacion/select').then((info)=>{
+            setFillrela( info.data.map(({id, idm,idg,idd, namemat,namegra,namedoc,namepro,namecal,namejor,numberid},x) =>{
+
+                const materiasrelaciondelete = (id) =>{
+                    const datos = {
+                        id:id
+                    }
+                    Swal.fire({
+                        title: `<strong>¿Desea eliminar: ${namemat}?</strong>`,
+                        showDenyButton: false,
+                        showCancelButton: true,
+                        confirmButtonText:'Eliminar',
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#3085d6',
+                        cancelButtonText:'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Putdata('materiasrelacion/delete',datos).then(res => {
+                                if(res?.data?.affectedRows > 0 ){
+                                    Alertas('Información',`Se eliminó la ${namemat} del sistema`)
+                                    setLoadrela(true)
+                                }
+                            })
+                        } 
+                    })
+                }
+
+
+                return <li key={x} className="list-group-item d-flex border-0 align-items-center justify-content-center">
+                            <div className="ms-2 me-auto ">
+                                <div className='text-primary fw-bold'>{namegra} {namecal} {namejor} - {namedoc} {numberid} {namepro}</div>
+                                <i className="bi bi-arrow-right-circle ms-3">{namemat}</i>
                             </div>
-                        <span><i className="bi bi-trash fs-4 px-2 text-danger"></i></span>
-                        <span><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></span>
-                    </li>
+                            <span><a onClick={() => materiasrelaciondelete(id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
+                            <span><a onClick={() => materiasrelacionedit(info.data[x])}><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></a></span>
+                        </li>
+            }))
+        })   
+    }
+
+    const materiasrelacionedit = ({id, idm,idg,idd}) => {
+
+        console.log('id si llega ', id);
+        inpCl.current.value =  idm
+        inpGra.current.value = idg
+        inpTeac.current.value = idd
+        const div = document.getElementById("btnrelchange")
+        div.innerHTML = ""
+
+        const btnedit = document.createElement('button')
+        btnedit.setAttribute('class', 'btn btn-primary mx-3 my-3')
+        btnedit.innerText = "Actualizar"
+        btnedit.id = 'btn_insert_sche'
+        btnedit.name = 'btn_insert_sche'
+        btnedit.onclick = function() { materiasrelacionupdate(id) }
+
+        const btncancel = document.createElement('button')
+        btncancel.setAttribute('class', 'btn btn-primary mx-3 my-3')
+        btncancel.innerText = "Cancelar"
+        btncancel.id = 'btn_cancel_sche'
+        btncancel.name = 'btn_cancel_sche'
+        btncancel.onclick = function() { materiasrelacioncancel() }
+
+        div.appendChild(btnedit)
+        div.appendChild(btncancel)
+
+    }
+
+    const materiasrelacioncancel = () => {
+        const div = document.getElementById("btnrelchange")
+        div.innerHTML = ""
+
+        const btnedit = document.createElement('button')
+        btnedit.setAttribute('class', 'btn btn-primary my-3')
+        btnedit.innerText = "Insertar"
+        btnedit.id = 'btn_insert_sche'
+        btnedit.name = 'btn_insert_sche'
+        btnedit.onclick = function() { insertRelationship() }
+        div.appendChild(btnedit)
+        inpCl.current.value = ''
+        inpGra.current.value = ''
+        inpTeac.current.value = ''
+    }
+
+    const materiasrelacionupdate = (id) => {
+        const inpmD = inpCl.current.value
+        const inpgD = inpGra.current.value
+        const inpdD = inpTeac.current.value
+       
+        if(!inpmD || !inpgD || !inpdD){
+            Alertas('Información','Los campos no pueden estar vacíos')
+            return false
+        }
+        const datos = {
+            id:id,
+            idm:inpmD,
+            idg:inpgD,
+            idd:inpdD,
+        }
+
+        Postdata('materiasrelacion/select',datos).then((ele) => {
+            if(ele?.data?.length){
+                Alertas('Información','Ya existe la relación')
+                return false
+            }else{
+                Putdata('materiasrelacion/edit',datos).then((res) => {
+                    if(res?.data?.affectedRows > 0){
+                        const div = document.getElementById("btnrelchange")
+                        div.innerHTML = ""
+
+                        const btnedit = document.createElement('button')
+                        btnedit.setAttribute('class', 'btn btn-primary my-3')
+                        btnedit.innerText = "Insertar"
+                        btnedit.id = 'btn_insert_sche'
+                        btnedit.name = 'btn_insert_sche'
+                        btnedit.onclick = function() { insertRelationship() }
+                        div.appendChild(btnedit)
+                        Alertas('Información', `Se actualizo la relación en el sistema`)
+                        inpCl.current.value = ''
+                        inpGra.current.value = ''
+                        inpTeac.current.value = ''
+                        setLoadrela(true)
+                        
+                    }else if(res?.data?.error){
+                        Alertas('Información', res.data.error)
+                        return false
+                    }
+                })
+            }
         })
-    )}
+    }
 
 
 
@@ -136,14 +389,14 @@ export default function Materias(){
                 <div className="row">
                     <div className="col-sm-12 col-md-6 mb-2" >
                         <div className="card h-100">
-                            <h3 className="my-2 text-center">Insertar materia</h3>
+                            <h3 className="my-2 text-center">{btnpro} materia</h3>
                             <div className="row align-items-center justify-content-center">
                                 <label htmlFor="inputNomCourse" className="col-5 col-form-label col-form-label-sm fs-4 fw-bold">Nombre materia</label>
                                 <div className="col-6">
                                     <input type="text" className="form-control border-primary" name='inputNomCourse' id="inputNomCourse"  ref={inputNomCourse}/>
                                 </div>
                             </div>
-                            <div className="text-center"> <button className='btn btn-primary my-3 ' onClick={insertCourse}>Insertar</button></div>
+                            <div className="text-center" id="btncoursechange"> <button className='btn btn-primary my-3 ' onClick={insertCourse}>Insertar</button></div>
                         </div>
                         
                     </div>
@@ -187,7 +440,7 @@ export default function Materias(){
                                         <label htmlFor="inpTeac">Docente</label>
                                     </div>
                                 </div>
-                            <div className="text-center"> <button className='btn btn-primary my-3 ' onClick={insertRelationship}>Insertar</button></div>
+                            <div className="text-center" id="btnrelchange"> <button className='btn btn-primary my-3 ' onClick={insertRelationship}>Insertar</button></div>
 
                             </div>
                         </div>
