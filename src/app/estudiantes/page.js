@@ -1,7 +1,8 @@
 "use client"
 import { Reducer } from "../components/context/themecontext";
+import { Getdata } from "../components/functions/Getdata";
 import Menu from "../components/menu/Menu"
-import { use, useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { useState } from 'react';
 
 const metadata = {
@@ -27,6 +28,8 @@ export default function Estudiantes(){
     const [fillstudent, setFillstudent] = useState('');
     const [fillrela, setFillrela] = useState('');
 
+    const [filltipo, setFilltipo] = useState('');
+
     useEffect(() => {
         loaddata()
         setLoad(false)
@@ -39,32 +42,77 @@ export default function Estudiantes(){
     },[loadrel]);
 
     const insertStudent = () => {
-        console.log('prueba de estudiante');
+        const name = inpStu.current.value.trim()
+        const lastname = inpLast.current.value.trim()
+        const typeid = inpId.current.value
+        const datebirth = inpBir.current.value.trim()
+        const telephone = inpTelfamilia.current.value.trim()
+        const email = inpMail.current.value.trim()
+        
+        if(!inpNomPro){
+            Alertas('Información','El campo no puede estar vacío')
+            return false
+        }
+        const datos = {
+            name:inpNomPro,
+        }
+        Postdata('estudiantes/select',datos).then((ele) => {
+            if(ele?.data?.length){
+                Alertas('Información','Ya existe la estudiantes')
+                return false
+            }else{
+                Postdata('estudiantes/insert',datos).then((res) => {
+                    if(res?.data?.affectedRows > 0){
+                        Alertas('Información', `Se inserto la estudiantes en el sistema`)
+                        inputNomestudiantes.current.value = ''
+                        setLoadrela(true)
+                    }else if(res?.data?.error){
+                        Alertas('Información', res.data.error)
+                        return false
+                    }
+                })
+            }
+          })
     }
 
     const loaddata = () =>{
 
-        setFillstu( datasite.estudiantes.map(({inNom,inApe,inTel,inpId},x) =>{
-             return <li key={x} className="list-group-item d-flex border-0 align-items-center justify-content-center">
-                        <div className="ms-2 me-auto">
-                                <div className='text-primary fw-bold'>{inNom}  {inApe} - {inpId}</div>
-                                    <i className="bi bi-arrow-right-circle ms-3">Tel. Acudiente:    {inTel}</i>
-                            </div>
-                        <span><i className="bi bi-trash fs-4 px-2 text-danger"></i></span>
-                        <span><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></span>
-                    </li>
-        }))
+        Getdata('tipoidentificacion/select').then((info)=>{
+            setFilltipo( info.data.map(({id, name},x) =>{
+                return <option key={x+1} value={id}>{name}</option>
+            }))
+        })
+
+        Getdata('estudiantes/select').then((info)=>{
+            setFillstu( info.data.map(({id, name,lastname,numberid,telephone},x) =>{
+                return <li key={x} className="list-group-item d-flex border-0 align-items-center justify-content-center">
+                            <div className="ms-2 me-auto">
+                                    <div className='text-primary fw-bold'>{name}  {lastname} - {numberid}</div>
+                                        <i className="bi bi-arrow-right-circle ms-3">Tel. Acudiente:    {telephone}</i>
+                                </div>
+                            <span><i className="bi bi-trash fs-4 px-2 text-danger"></i></span>
+                            <span><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></span>
+                        </li>
+            }))
+        })
+
     }
 
 
     const filldatarelationship =() =>{
-        setFillgrade( datasite.grados.map(({inpG,inpC,inpJ},x) =>{
-            return <option key={x+1} value={inpG +' - '+ inpC  +' - '+ inpJ}>{inpG +' - '+ inpC  +' - '+ inpJ}</option>
-        }))
 
-        setFillstudent( datasite.estudiantes.map(({inNom,inpId},x) =>{
-            return <option key={x+1} value={inpId}>{inNom} - {inpId}</option>
-        }))
+        Getdata('grados/select').then((info)=>{
+            setFillgrade( info.data.map(({idgra, namegra,namecal,namejor},x) =>{
+                return <option key={x+1} value={idgra}>{namegra +' - '+ namecal  +' - '+ namejor}</option>
+            }))
+        })      
+
+        //select relacion de estudiante materia
+        Getdata('estudiantes/select').then((info)=>{
+            setFillrela( info.data.map(({id, name,numberid},x) =>{
+                return <option key={x+1} value={id}>{name}  {numberid}</option>
+            }))
+        })
     }
 
     const insertRelationshipsstu = () => {
@@ -110,8 +158,8 @@ export default function Estudiantes(){
                                 <label htmlFor="inpId" className="col-5 col-form-label col-form-label-sm fs-4 fw-bold">Tipo identificación</label>
                                 <div className="col-6">
                                     <select className="form-select border-primary">
-                                        <option value={1}>CC</option>
-                                        <option value={2}>TI</option>
+                                        <option key={0} value={''}>Selecciona tipo</option>
+                                        {filltipo}
                                     </select>
                                 </div>
                             </div>
