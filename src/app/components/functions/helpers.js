@@ -13,6 +13,8 @@ const Alertas = (title,msg) => {
           focusConfirm: false,
           confirmButtonText:'Cerrar',
           confirmButtonColor: '#3085d6',
+          timer: 2000,
+          timerProgressBar: true,
         })
   }
 export {FirstletterUpper,Alertas};
