@@ -1,4 +1,5 @@
 "use client"
+import Swal from "sweetalert2";
 import { Postdata } from "../components/functions/Postdata";
 import { Putdata } from "../components/functions/Putdata";
 import { Alertas, FirstletterUpper } from "../components/functions/helpers";
@@ -122,9 +123,9 @@ export default function Notas(){
                 inp.setAttribute("max", 100)
                 inp.setAttribute("min", 0.0)
                 inp.setAttribute("step", 0.0)
-                inp.onkeyup = () => updatenote (id)
+              //  inp.onkeyup = () => updatenote (id)
                 inp.onchange = () => updatenote (id)
-                inp.value = num
+                inp.value = Number.parseFloat(num).toFixed(1)
                 td.appendChild(inp);
                 tbtr.appendChild(td);
                 tblBody.appendChild(tbtr)
@@ -145,15 +146,6 @@ export default function Notas(){
             td.appendChild(cellText);
             tbtr.appendChild(td);
         })
-        let tbtr = ''
-        tbtr = document.createElement('tr')
-        let td = document.createElement('td')
-        td.colSpan = 12
-        td.classList.add('text-center')
-        let cellTextmat = document.createTextNode('No hay asignaturas asociadas');
-        td.appendChild(cellTextmat);
-        tbtr.appendChild(td);
-        tblBody.appendChild(tbtr)
 
         tbl.setAttribute('class', 'table table-bordered border-primary table-sm table-striped  ')
         tbl.appendChild(tblBody)
@@ -175,12 +167,34 @@ export default function Notas(){
 
     const updatenotesdatabase = () => {
         const len = nuevoArray.filter(object => object.num == '' )
+        const datos = {uptnotes:nuevoArray}
         if(nuevoArray.length === 0){
             Alertas('Informacióm','No hay notas para actualizar')
         }else if(len.length){
-            Alertas('Informacióm','Validar notas ingresadas')
+            Swal.fire({
+                title: 'Informacióm',
+                text: "Hay campos vacíos o mal digitados, desea continuar",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Actualizar'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                    Putdata('notas/edit',datos).then(res => {
+                        if(res?.data?.affectedRows > 0){
+                            Alertas('Información', `Se actualizaron las notas en el sistema`)
+                            loaddatanotes()
+                        }else if(res?.data?.error){
+                            Alertas('Información', res.data.error)
+                            return false
+                        }
+                   })
+                }
+              })
+          //  Alertas('Informacióm','Validar notas ingresadas')
         }else{
-            const datos = {uptnotes:nuevoArray}
+            
             Putdata('notas/edit',datos).then(res => {
                 if(res?.data?.affectedRows > 0){
                     Alertas('Información', `Se actualizaron las notas en el sistema`)
@@ -239,7 +253,7 @@ export default function Notas(){
         const idE = inpE.current.value  
         const idM = inpM.current.value
         const idP = inpP.current.value
-        const idN = parseFloat(inpN.current.value).toFixed(1)
+        const idN = Number.parseFloat(inpN.current.value).toFixed(1)
 
         if(!idE || !idM || !idP || !idN){
             Alertas('Información','Validar campos obligatorios')
@@ -265,6 +279,7 @@ export default function Notas(){
     }
 
     const loaddatanotes = () => {
+        nuevoArray = []
         const val = inputSearch.current.value
         const datos = {
                         datafind: val
