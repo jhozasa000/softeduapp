@@ -10,6 +10,7 @@ import { Postdata } from './components/functions/Postdata';
 
 export default function Login() {
 
+  // variables de los input
   const inputuser = useRef(null);
   const inputpass = useRef(null);
   const router = useRouter()
@@ -18,19 +19,24 @@ export default function Login() {
     const inpUser = inputuser.current.value
     const inpPass = inputpass.current.value
 
+    // se valida los campos
     if(!inpUser || !inpPass){
       Alertas( 'Información' ,'Digilenciar todos los campos')
       return false
     }
 
+    // se crea el objecto
     const datos = {
       user:inpUser,
       pass:inpPass
     }
 
+    // se envia al enrutamiento de login para validar
     Postdata('login',datos).then((ele) => {
       if(ele.data.length){
-        localStorage.setItem('datauser',JSON.stringify(ele.data))         
+        // se guarda informacion del usuario
+        localStorage.setItem('datauser',JSON.stringify(ele.data))  
+        // se redirecciona       
         router.push('/home')
       }else{
         Alertas( 'Información' ,'Validar datos ingresados')

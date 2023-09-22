@@ -1,3 +1,4 @@
+// se importan librerias globlaes de estilos y componentes
 import './globals.css'
 import { Roboto } from 'next/font/google'
 import 'bootstrap/dist/css/bootstrap.css';

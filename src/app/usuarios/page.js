@@ -14,19 +14,20 @@ import { Putdata } from "../components/functions/Putdata";
 }
 
 export default function Usuarios(){
+    // declaracion de variables
   const inpuser = useRef(null)
   const inppass = useRef(null)
   const [loadusers, setLoadusers] = useState(true);
   const [fillusers, setFillusers] = useState('');
   const [btnprorel, setBtnprorel] = useState('Insertar');
 
+   // declaracion de inicializacion de funcion
   useEffect(() => {
     setLoadusers(false)
     load()
   },[loadusers]);
 
-  //plantilla vista
-
+ // funcion insertar usuarios
 const insert = () =>{
     const inpS = inpuser.current.value.trim()
     const inpG = inppass.current.value.trim()
@@ -69,6 +70,7 @@ Getdata('usuarios/select').then((info)=>{
             const datos = {
                 id:id
             }
+            // cuadro de confirmacion para eliminar regstro
             Swal.fire({
                 title: `<strong>¿Desea eliminar: ${name}?</strong>`,
                 showDenyButton: false,
@@ -89,7 +91,7 @@ Getdata('usuarios/select').then((info)=>{
             })
         }
 
-
+        // se retorna lista 
         return <li key={x} className="list-group-item d-flex border-0 align-items-center justify-content-center">
                     <div className="ms-2 me-auto ">
                     <div className='text-primary fw-bold'>Usuario - {name}</div>
@@ -103,12 +105,14 @@ Getdata('usuarios/select').then((info)=>{
 }
 
 const usuariosedit = ({id,name,pass}) => {
+    // se setean los valores en los input
     inpuser.current.value = name
     inppass.current.value = pass
 
     const div = document.getElementById("btnsturelchange")
     div.innerHTML = ""
 
+    // se crean los botones
     const btnedit = document.createElement('button')
     btnedit.setAttribute('class', 'btn btn-primary mx-3 my-3')
     btnedit.innerText = "Actualizar"
