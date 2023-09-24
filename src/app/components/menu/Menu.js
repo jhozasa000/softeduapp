@@ -22,6 +22,7 @@ export default  function Menu(page) {
             { link: 'notas', icon: false},
             { link: 'reportes', icon: false},
             { link: 'usuarios', icon: false},
+            { link: 'anuncios', icon: false},
     ]
 
     const loadmenu = menu.map(({link},i) => {
