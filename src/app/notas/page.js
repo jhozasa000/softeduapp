@@ -160,9 +160,6 @@ export default function Notas(){
         }else{	
             nuevoArray.push({id:id,num:val})
         }
-
-        console.log('nuevoArray   ---  ', nuevoArray);
-
     }
 
     const updatenotesdatabase = () => {
