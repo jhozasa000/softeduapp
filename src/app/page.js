@@ -1,5 +1,4 @@
 "use client"
-import {  Reducer } from './components/context/themecontext';
 import Image from 'next/image'
 import styles from './page.module.css'
 import logo from '../../public/logo.png'
@@ -28,18 +27,19 @@ export default function Login() {
     // se crea el objecto
     const datos = {
       user:inpUser,
-      pass:inpPass
+      pass:inpPass,
+      state:1
     }
 
     // se envia al enrutamiento de login para validar
     Postdata('login',datos).then((ele) => {
-      if(ele.data.length){
+      if(!ele.data.error){
         // se guarda informacion del usuario
         localStorage.setItem('datauser',JSON.stringify(ele.data))  
         // se redirecciona       
         router.push('/home')
       }else{
-        Alertas( 'Información' ,'Validar datos ingresados')
+        Alertas( 'Información' ,ele.data.error)
         return false
       }
     })

@@ -40,17 +40,18 @@ const insert = () =>{
     const datos = {
         title:inpT,
         description:inpDes,
-        date:inpDat
+        date:inpDat,
+        state:1
     }
 
     Postdata('anuncios/insert',datos).then((res) => {
-        if(res?.data?.affectedRows > 0){
+        if(res.data.acknowledged){
             Alertas('Información', `Se inserto el anuncio en el sistema`)
             inptitle.current.value  = ''
             inpdescription.current.value  = ''
             inpdate.current.value  = ''
             setLoadusers(true)
-        }else if(res?.data?.error){
+        }else if(res.data.error){
             Alertas('Información', res.data.error)
             return false
         }
@@ -60,8 +61,7 @@ const insert = () =>{
 
 const load = () =>{
 Getdata('anuncios/select').then((info)=>{
-    setFillusers( info.data.map(({id, title,description},x) =>{
-
+    setFillusers( info.data.map(({_id, title,description,date},x) => {
         const anunciosdelete = (id) =>{
             const datos = {
                 id:id
@@ -78,7 +78,7 @@ Getdata('anuncios/select').then((info)=>{
             }).then((result) => {
                 if (result.isConfirmed) {
                     Putdata('anuncios/delete',datos).then(res => {
-                        if(res?.data?.affectedRows > 0 ){
+                        if(res.data.matchedCount > 0 ){
                             Alertas('Información',`Se eliminó  ${title} del sistema`)
                             setLoadusers(true)
                         }
@@ -90,17 +90,17 @@ Getdata('anuncios/select').then((info)=>{
         // se retorna lista 
         return <li key={x} className="list-group-item d-flex border-0 align-items-center justify-content-center">
                     <div className="ms-2 me-auto ">
-                    <div className='text-primary fw-bold'>Titulo - {title}</div>
+                    <div className='text-primary fw-bold'>Titulo - {title} | Fecha - {date}</div>
                         <i className="bi bi-arrow-right-circle ms-3">{description}</i>
                     </div>
-                    <span><a onClick={() => anunciosdelete(id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
+                    <span><a onClick={() => anunciosdelete(_id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
                     <span><a onClick={() => anunciosedit(info.data[x])}><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></a></span>
                 </li>
     }))
 })   
 }
 
-const anunciosedit = ({id,title,description,date}) => {
+const anunciosedit = ({_id,title,description,date}) => {
     // se setean los valores en los input
     inptitle.current.value = title
     inpdescription.current.value = description
@@ -109,13 +109,15 @@ const anunciosedit = ({id,title,description,date}) => {
     const div = document.getElementById("btnsturelchange")
     div.innerHTML = ""
 
+    setBtnprorel('Actualizar')
+
     // se crean los botones
     const btnedit = document.createElement('button')
     btnedit.setAttribute('class', 'btn btn-primary mx-3 my-3')
     btnedit.innerText = "Actualizar"
     btnedit.id = 'btn_insert_sche'
     btnedit.name = 'btn_insert_sche'
-    btnedit.onclick = function() { anunciosupdate(id) }
+    btnedit.onclick = function() { anunciosupdate(_id) }
 
     const btncancel = document.createElement('button')
     btncancel.setAttribute('class', 'btn btn-primary mx-3 my-3')
@@ -132,7 +134,7 @@ const anunciosedit = ({id,title,description,date}) => {
 const anuncioscancel = () => {
     const div = document.getElementById("btnsturelchange")
     div.innerHTML = ""
-
+    setBtnprorel('Insertar')
     const btnedit = document.createElement('button')
     btnedit.setAttribute('class', 'btn btn-primary my-3')
     btnedit.innerText = "Insertar"
@@ -149,7 +151,7 @@ const anunciosupdate = (id) => {
     const inpT = inptitle.current.value.trim()
     const inpDes = inpdescription.current.value.trim()
     const inpDat = inpdate.current.value.trim()
-    if(!inpT || !inpDes){
+    if(!inpT || !inpDes || !inpDat){
         Alertas('Información','Los campos no pueden estar vacíos')
         return false
     }
@@ -162,7 +164,7 @@ const anunciosupdate = (id) => {
     }
 
     Putdata('anuncios/edit',datos).then((res) => {
-        if(res?.data?.affectedRows > 0){
+        if(res.data.matchedCount > 0){
             const div = document.getElementById("btnsturelchange")
             div.innerHTML = ""
 
@@ -180,7 +182,7 @@ const anunciosupdate = (id) => {
             inpdate.current.value = ''
             setLoadusers(true)
             
-        }else if(res?.data?.error){
+        }else if(res.data.error){
             Alertas('Información', res.data.error)
             return false
         }
