@@ -36,19 +36,19 @@ const insert = () =>{
         return false
     }
     const datos = {
-        datauser:inpS,
-        datapass:inpG
+        user:inpS,
+        pass:inpG,
+        level:1,
+        state:1
     }
 
- console.log('datos   ', datos);
-
     Postdata('usuarios/select',datos).then((ele) => {
-        if(ele?.data?.length){
+      if(ele.data.length){
             Alertas('Información','Ya existe el usuario')
             return false
         }else{
             Postdata('usuarios/insert',datos).then((res) => {
-                if(res?.data?.affectedRows > 0){
+                if(res.data.acknowledged){
                     Alertas('Información', `Se inserto el usuario en el sistema`)
                     inpuser.current.value  = ''
                     inppass.current.value  = ''
@@ -64,7 +64,7 @@ const insert = () =>{
 
 const load = () =>{
 Getdata('usuarios/select').then((info)=>{
-    setFillusers( info.data.map(({id, name},x) =>{
+    setFillusers( info.data.map(({_id, user},x) =>{
 
         const usuariosdelete = (id) =>{
             const datos = {
@@ -72,7 +72,7 @@ Getdata('usuarios/select').then((info)=>{
             }
             // cuadro de confirmacion para eliminar regstro
             Swal.fire({
-                title: `<strong>¿Desea eliminar: ${name}?</strong>`,
+                title: `<strong>¿Desea eliminar: ${user}?</strong>`,
                 showDenyButton: false,
                 showCancelButton: true,
                 confirmButtonText:'Eliminar',
@@ -82,8 +82,8 @@ Getdata('usuarios/select').then((info)=>{
             }).then((result) => {
                 if (result.isConfirmed) {
                     Putdata('usuarios/delete',datos).then(res => {
-                        if(res?.data?.affectedRows > 0 ){
-                            Alertas('Información',`Se eliminó  ${name} del sistema`)
+                        if(res?.data?.matchedCount > 0 ){
+                            Alertas('Información',`Se eliminó  ${user} del sistema`)
                             setLoadusers(true)
                         }
                     })
@@ -94,19 +94,19 @@ Getdata('usuarios/select').then((info)=>{
         // se retorna lista 
         return <li key={x} className="list-group-item d-flex border-0 align-items-center justify-content-center">
                     <div className="ms-2 me-auto ">
-                    <div className='text-primary fw-bold'>Usuario - {name}</div>
-                        <i className="bi bi-arrow-right-circle ms-3">{name}</i>
+                    <div className='text-primary fw-bold'>Usuario</div>
+                        <i className="bi bi-arrow-right-circle ms-3">{user}</i>
                     </div>
-                    <span><a onClick={() => usuariosdelete(id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
+                    <span><a onClick={() => usuariosdelete(_id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
                     <span><a onClick={() => usuariosedit(info.data[x])}><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></a></span>
                 </li>
     }))
 })   
 }
 
-const usuariosedit = ({id,name,pass}) => {
+const usuariosedit = ({_id,user,pass}) => {
     // se setean los valores en los input
-    inpuser.current.value = name
+    inpuser.current.value = user
     inppass.current.value = pass
 
     const div = document.getElementById("btnsturelchange")
@@ -118,7 +118,7 @@ const usuariosedit = ({id,name,pass}) => {
     btnedit.innerText = "Actualizar"
     btnedit.id = 'btn_insert_sche'
     btnedit.name = 'btn_insert_sche'
-    btnedit.onclick = function() { usuariosupdate(id) }
+    btnedit.onclick = function() { usuariosupdate(_id) }
 
     const btncancel = document.createElement('button')
     btncancel.setAttribute('class', 'btn btn-primary mx-3 my-3')
@@ -156,8 +156,8 @@ const usuariosupdate = (id) => {
     }
 
     const datos = {
-        datauser:inpS,
-        datapass:inpG,
+        user:inpS,
+        pass:inpG,
         id:id
     }
 
@@ -167,7 +167,7 @@ const usuariosupdate = (id) => {
             return false
         }else{
             Putdata('usuarios/edit',datos).then((res) => {
-                if(res?.data?.affectedRows > 0){
+                if(res?.data?.matchedCount > 0){
                     const div = document.getElementById("btnsturelchange")
                     div.innerHTML = ""
 
