@@ -1,5 +1,4 @@
 "use client"
-import { Reducer } from "../components/context/themecontext";
 import { Getdata } from "../components/functions/Getdata";
 import { Postdata } from "../components/functions/Postdata";
 import { Putdata } from "../components/functions/Putdata";
@@ -18,7 +17,6 @@ export default function Calendario(){
 
     const inputNomCal = useRef(null);
     const inputNomSchoolday = useRef(null);
-    const { datasite, setDatasite } = Reducer();
     const [loadcal, setLoadcal] = useState(true);
     const [fillcall, setFillcall] = useState('');
     const [fillschoolday, setFillschoolday] = useState('');
@@ -44,6 +42,7 @@ export default function Calendario(){
         }
         const datos = {
             name:inpNomCal,
+            state:1
         }
         Postdata('calendario/select',datos).then((ele) => {
             if(ele?.data?.length){
@@ -51,7 +50,7 @@ export default function Calendario(){
                 return false
             }else{
                 Postdata('calendario/insert',datos).then((res) => {
-                    if(res?.data?.affectedRows > 0){
+                    if(res?.data?.acknowledged){
                         Alertas('Información', `Se inserto el calendario en el sistema`)
                         inputNomCal.current.value = ''
                         setLoadcal(true)
@@ -66,7 +65,7 @@ export default function Calendario(){
 
     const loaddata = () =>{
         Getdata('calendario/select').then((info)=>{
-            setFillcall( info.data.map(({id, name},x) =>{
+            setFillcall( info.data.map(({_id, name},x) =>{
 
                 const calendariodelete = (id) =>{
                     const datos = {
@@ -83,7 +82,7 @@ export default function Calendario(){
                     }).then((result) => {
                         if (result.isConfirmed) {
                             Putdata('calendario/delete',datos).then(res => {
-                                if(res?.data?.affectedRows > 0 ){
+                                if(res?.data?.matchedCount > 0 ){
                                     Alertas('Información',`Se eliminó el ${name} del sistema`)
                                     setLoadcal(true)
                                 }
@@ -97,14 +96,14 @@ export default function Calendario(){
                             <div className="ms-2 me-auto ">
                                 <i className="bi bi-arrow-right-circle ms-3">{name}</i>
                             </div>
-                            <span><a onClick={() => calendariodelete(id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
+                            <span><a onClick={() => calendariodelete(_id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
                             <span><a onClick={() => calendarioedit(info.data[x])}><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></a></span>
                         </li>
             }))
         })   
     }
 
-    const calendarioedit = ({id,name}) => {
+    const calendarioedit = ({_id,name}) => {
         setBtncal("Actualizar")
         inputNomCal.current.value = name
         const div = document.getElementById("btncalchange")
@@ -115,7 +114,7 @@ export default function Calendario(){
         btnedit.innerText = "Actualizar"
         btnedit.id = 'btn_insert_sche'
         btnedit.name = 'btn_insert_sche'
-        btnedit.onclick = function() { calendarioupdate(id) }
+        btnedit.onclick = function() { calendarioupdate(_id) }
 
         const btncancel = document.createElement('button')
         btncancel.setAttribute('class', 'btn btn-primary mx-3 my-3')
@@ -161,7 +160,7 @@ export default function Calendario(){
                 return false
             }else{
                 Putdata('calendario/edit',datos).then((res) => {
-                    if(res?.data?.affectedRows > 0){
+                    if(res?.data?.matchedCount > 0){
                         const div = document.getElementById("btncalchange")
                         div.innerHTML = ""
 
@@ -195,6 +194,7 @@ export default function Calendario(){
 
         const datos = {
             name:inpNonSchoolday,
+            state:1
         }
         Postdata('jornada/select',datos).then((ele) => {
             if(ele?.data?.length){
@@ -202,7 +202,7 @@ export default function Calendario(){
                 return false
             }else{
                 Postdata('jornada/insert',datos).then((res) => {
-                    if(res?.data?.affectedRows > 0){
+                    if(res?.data?.acknowledged){
                         Alertas('Información', `Se inserto la jornada en el sistema`)
                         inputNomSchoolday.current.value = ''
                         setLoadschoolday(true)
@@ -215,7 +215,7 @@ export default function Calendario(){
     const loaddataschoolday = () =>{
 
         Getdata('jornada/select').then((info)=>{
-            setFillschoolday( info.data.map(({id, name},x) =>{
+            setFillschoolday( info.data.map(({_id, name},x) =>{
 
                 const jornadadelete = (id) =>{
                     const datos = {
@@ -232,7 +232,7 @@ export default function Calendario(){
                     }).then((result) => {
                         if (result.isConfirmed) {
                             Putdata('jornada/delete',datos).then(res => {
-                                if(res?.data?.affectedRows > 0 ){
+                                if(res?.data?.matchedCount > 0 ){
                                     Alertas('Información',`Se eliminó la jornada ${name} del sistema`)
                                     setLoadschoolday(true)
                                 }
@@ -246,14 +246,14 @@ export default function Calendario(){
                             <div className="ms-2 me-auto ">
                                 <i className="bi bi-arrow-right-circle ms-3">{name}</i>
                             </div>
-                            <span><a onClick={() => jornadadelete(id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
+                            <span><a onClick={() => jornadadelete(_id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
                             <span><a onClick={() => jornadaedit(info.data[x])}><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></a></span>
                         </li>
             }))
         })  
     }
 
-    const jornadaedit = ({id,name}) => {
+    const jornadaedit = ({_id,name}) => {
         setBtnjor("Actualizar")
         inputNomSchoolday.current.value = name
         const div = document.getElementById("btnjornada")
@@ -264,7 +264,7 @@ export default function Calendario(){
         btnedit.innerText = "Actualizar"
         btnedit.id = 'btn_insert_jor'
         btnedit.name = 'btn_insert_jor'
-        btnedit.onclick = function() { jornadaupdate(id) }
+        btnedit.onclick = function() { jornadaupdate(_id) }
 
         const btncancel = document.createElement('button')
         btncancel.setAttribute('class', 'btn btn-primary mx-3 my-3')
@@ -310,7 +310,7 @@ export default function Calendario(){
                 return false
             }else{
                 Putdata('jornada/edit',datos).then((res) => {
-                    if(res?.data?.affectedRows > 0){
+                    if(res?.data?.matchedCount > 0){
                         const div = document.getElementById("btnjornada")
                         div.innerHTML = ""
 
