@@ -1,11 +1,11 @@
 "use client"
 import { Getdata } from "../components/functions/Getdata";
-import { Reducer } from "../components/context/themecontext";
 import { Alertas } from "../components/functions/helpers";
 import Menu from "../components/menu/Menu"
 import { useEffect, useRef, useState } from 'react';
 import { Postdata } from "../components/functions/Postdata";
 import { Putdata } from "../components/functions/Putdata";
+import Swal from "sweetalert2";
 
 const metadata = {
     title: 'grados',
@@ -17,7 +17,6 @@ export default function Grados(){
     const inputNomCourse = useRef(null);
     const inputcal = useRef(null);
     const inputjor = useRef(null);
-    const { datasite, setDatasite } = Reducer();
     const [loadcourse, setLoadcourse] = useState(false);
     const [fillcor, setFillcor] = useState('');
     const [fillcal, setFillcal] = useState(true);
@@ -27,15 +26,15 @@ export default function Grados(){
     useEffect(() => {
             setLoadcourse(false)
             Getdata('calendario/select').then((info)=>{
-                setFillcal( info.data.map(({id, name},x) =>{
-                    return <option key={x+1} value={id}>{name}</option>
+                setFillcal( info.data.map(({_id, name},x) =>{
+                    return <option key={x+1} value={_id}>{name}</option>
 
                 }))
             })
 
             Getdata('jornada/select').then((info)=>{
-                setFillday( info.data.map(({id, name},x) =>{
-                    return <option key={x+1} value={id}>{name}</option>
+                setFillday( info.data.map(({_id, name},x) =>{
+                    return <option key={x+1} value={_id}>{name}</option>
 
                 }))
             })
@@ -63,7 +62,7 @@ export default function Grados(){
                 return false
             }else{
                 Postdata('grados/insert',datos).then((res) => {
-                    if(res?.data?.affectedRows > 0){
+                    if(res?.data?.acknowledged){
                         Alertas('Información', `Se inserto el grado en el sistema`)
                         inputNomCourse.current.value = ''
                         inputjor.current.value = ''
@@ -80,14 +79,14 @@ export default function Grados(){
 
     const loaddata = () =>{
         Getdata('grados/select').then((info)=>{
-            setFillcor( info.data.map(({idgra, namegra,namecal,namejor},x) =>{
+            setFillcor( info.data.map(({_id, name,fromCal,fromJor},x) => {
 
                 const gradosdelete = (id) =>{
                     const datos = {
                         id:id
                     }
                     Swal.fire({
-                        title: `<strong>¿Desea eliminar: ${namegra} - ${namecal} - ${namejor}?</strong>`,
+                        title: `<strong>¿Desea eliminar: ${name} - ${fromCal.name} - ${fromJor.name}?</strong>`,
                         showDenyButton: false,
                         showCancelButton: true,
                         confirmButtonText:'Eliminar',
@@ -97,8 +96,8 @@ export default function Grados(){
                     }).then((result) => {
                         if (result.isConfirmed) {
                             Putdata('grados/delete',datos).then(res => {
-                                if(res?.data?.affectedRows > 0 ){
-                                    Alertas('Información',`Se eliminó el ${namegra} - ${namecal} - ${namejor} del sistema`)
+                                if(res?.data?.matchedCount > 0 ){
+                                    Alertas('Información',`Se eliminó el ${name} - ${fromCal.name} - ${fromJor.name} del sistema`)
                                     setLoadcourse(true)
                                 }
                             })
@@ -109,10 +108,10 @@ export default function Grados(){
 
                 return <li key={x} className="list-group-item d-flex border-0 align-items-center justify-content-center">
                             <div className="ms-2 me-auto">
-                                <div className='text-primary fw-bold'>{namegra}</div>
-                                <i className="bi bi-arrow-right-circle ms-3">{namecal} - {namejor}</i>
+                                <div className='text-primary fw-bold'>{name}</div>
+                                <i className="bi bi-arrow-right-circle ms-3">{fromCal.name} - {fromJor.name}</i>
                             </div>
-                            <span><a onClick={() => gradosdelete(idgra)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
+                            <span><a onClick={() => gradosdelete(_id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
                             <span><a onClick={() => gradosedit(info.data[x])}><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></a></span>
                         </li>
             }))
@@ -120,9 +119,9 @@ export default function Grados(){
     }
 
 
-    const gradosedit = ({idgra, namegra,idcal,idjor}) => {
+    const gradosedit = ({_id, name,idcal,idjor}) => {
         setBtnpro("Actualizar")
-        inputNomCourse.current.value = namegra
+        inputNomCourse.current.value = name
         inputcal.current.value = idcal
         inputjor.current.value = idjor
 
@@ -134,7 +133,7 @@ export default function Grados(){
         btnedit.innerText = "Actualizar"
         btnedit.id = 'btn_insert_sche'
         btnedit.name = 'btn_insert_sche'
-        btnedit.onclick = function() { gradosupdate(idgra) }
+        btnedit.onclick = function() { gradosupdate(_id) }
 
         const btncancel = document.createElement('button')
         btncancel.setAttribute('class', 'btn btn-primary mx-3 my-3')
@@ -186,7 +185,7 @@ export default function Grados(){
                 return false
             }else{
                 Putdata('grados/edit',datos).then((res) => {
-                    if(res?.data?.affectedRows > 0){
+                    if(res?.data?.matchedCount > 0){
                         const div = document.getElementById("btnprochange")
                         div.innerHTML = ""
 
