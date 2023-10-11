@@ -4,7 +4,7 @@ const FirstletterUpper = (value) => {
     return value[0].toUpperCase() + value.slice(1).toLowerCase();
 }
 
-const Alertas = (title,msg) => {
+const Alertas = (title,msg,time) => {
     Swal.fire({
           title: `<strong>${title}</strong>`,
           html:msg,
@@ -13,7 +13,7 @@ const Alertas = (title,msg) => {
           focusConfirm: false,
           confirmButtonText:'Cerrar',
           confirmButtonColor: '#3085d6',
-          timer: 2000,
+          timer: time??2000,
           timerProgressBar: true,
         })
   }

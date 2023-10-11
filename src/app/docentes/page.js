@@ -1,5 +1,4 @@
 "use client"
-import { Reducer } from "../components/context/themecontext";
 import { Getdata } from "../components/functions/Getdata";
 import { Postdata } from "../components/functions/Postdata";
 import { Putdata } from "../components/functions/Putdata";
@@ -17,7 +16,6 @@ const metadata = {
 export default function Docentes(){    
 
     const inputNomProfesion = useRef(null);
-    const { datasite, setDatasite } = Reducer();
     const [loadpro, setLoadpro] = useState(true);
     const [fillpro, setFillpro] = useState('');
 
@@ -37,12 +35,13 @@ export default function Docentes(){
         setLoadpro(false)
         loaddata()
         fillcareers()
-    }, [loadpro]);
-
-    useEffect(() => {
         setLoadteacher(false)
         loaddataTeacher()
-    }, [loadteacher]);
+    }, [loadpro,loadteacher]);
+
+  /*  useEffect(() => {
+        
+    }, []);*/
 
     //funciones profesion
     const insertBachelor = () =>{
@@ -53,6 +52,7 @@ export default function Docentes(){
         }
         const datos = {
             name:inpNomPro,
+            state:1
         }
         Postdata('profesion/select',datos).then((ele) => {
             if(ele?.data?.length){
@@ -60,7 +60,7 @@ export default function Docentes(){
                 return false
             }else{
                 Postdata('profesion/insert',datos).then((res) => {
-                    if(res?.data?.affectedRows > 0){
+                    if(res?.data?.acknowledged){
                         Alertas('Información', `Se inserto la profesion en el sistema`)
                         inputNomProfesion.current.value = ''
                         setLoadpro(true)
@@ -72,7 +72,7 @@ export default function Docentes(){
 
     const loaddata = () =>{
         Getdata('profesion/select').then((info)=>{
-            setFillpro( info.data.map(({id, name},x) =>{
+            setFillpro( info.data.map(({_id, name},x) =>{
 
                 const profesiondelete = (id) =>{
                     const datos = {
@@ -89,7 +89,7 @@ export default function Docentes(){
                     }).then((result) => {
                         if (result.isConfirmed) {
                             Putdata('profesion/delete',datos).then(res => {
-                                if(res?.data?.affectedRows > 0 ){
+                                if(res?.data?.matchedCount > 0 ){
                                     Alertas('Información',`Se eliminó la profesión ${name} del sistema`)
                                     setLoadpro(true)
                                 }
@@ -103,14 +103,14 @@ export default function Docentes(){
                             <div className="ms-2 me-auto ">
                                 <i className="bi bi-arrow-right-circle ms-3">{name}</i>
                             </div>
-                            <span><a onClick={() => profesiondelete(id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
+                            <span><a onClick={() => profesiondelete(_id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
                             <span><a onClick={() => profesionedit(info.data[x])}><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></a></span>
                         </li>
             }))
         })   
     }
 
-    const profesionedit = ({id,name}) => {
+    const profesionedit = ({_id,name}) => {
         setBtnpro("Actualizar")
         inputNomProfesion.current.value = name
         const div = document.getElementById("btnprochange")
@@ -121,7 +121,7 @@ export default function Docentes(){
         btnedit.innerText = "Actualizar"
         btnedit.id = 'btn_insert_sche'
         btnedit.name = 'btn_insert_sche'
-        btnedit.onclick = function() { profesionupdate(id) }
+        btnedit.onclick = function() { profesionupdate(_id) }
 
         const btncancel = document.createElement('button')
         btncancel.setAttribute('class', 'btn btn-primary mx-3 my-3')
@@ -167,7 +167,7 @@ export default function Docentes(){
                 return false
             }else{
                 Putdata('profesion/edit',datos).then((res) => {
-                    if(res?.data?.affectedRows > 0){
+                    if(res?.data?.matchedCount > 0){
                         const div = document.getElementById("btnprochange")
                         div.innerHTML = ""
 
@@ -191,8 +191,8 @@ export default function Docentes(){
 
     const fillcareers = () => {
         Getdata('profesion/select').then((info)=>{
-            setfillcarr( info.data.map(({id, name},x) =>{
-                return <option key={x+1} value={id}>{name}</option>
+            setfillcarr( info.data.map(({_id, name},x) =>{
+                return <option key={x+1} value={_id}>{name}</option>
             }))
         })
     }
@@ -229,7 +229,7 @@ export default function Docentes(){
                         Alertas('Información',res?.data?.error)
                     }
 
-                    if(res?.data?.affectedRows > 0){
+                    if(res?.data?.acknowledged){
                         Alertas('Información', `Se inserto el docente en el sistema`)
                         inp.current.value = ''
                         inpcedula.current.value = ''
@@ -246,7 +246,10 @@ export default function Docentes(){
 
     const loaddataTeacher = () =>{
         Getdata('docentes/select').then((info)=>{
-            setFillteacher( info.data.map(({id, name, numberid, profession},x) =>{
+
+            console.log('docentes load    ', info);
+
+            setFillteacher( info.data.map(({_id, name, numberid, fromProfession},x) =>{
 
                 const docentesdelete = (id) =>{
                     const datos = {
@@ -263,7 +266,7 @@ export default function Docentes(){
                     }).then((result) => {
                         if (result.isConfirmed) {
                             Putdata('docentes/delete',datos).then(res => {
-                                if(res?.data?.affectedRows > 0 ){
+                                if(res?.data?.matchedCount > 0 ){
                                     Alertas('Información',`Se eliminó docente ${name} del sistema`)
                                     setLoadteacher(true)
                                 }
@@ -276,18 +279,18 @@ export default function Docentes(){
                 return <li key={x} className="list-group-item d-flex text-start text-wrap">
                         <div className="ms-2 me-auto">
                             <div className='text-primary fw-bold'>{name} - {numberid}</div>
-                                <i className="bi bi-arrow-right-circle ms-3">{profession}</i>
+                                <i className="bi bi-arrow-right-circle ms-3">{fromProfession[0].name}</i>
                         </div>
                         <span><a onClick={() => docentesview(info.data[x])}><i className="bi bi-person-rolodex fs-4 px-2 text-primary"></i></a></span>
-                        <span><a onClick={() => docentesdelete(id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
+                        <span><a onClick={() => docentesdelete(_id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
                         <span><a onClick={() => docentesedit(info.data[x])}><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></a></span>
                     </li>
             }))
         })   
     }
 
-    const docentesview = ({id,name,numberid,profession,telephone,address,files}) => {
-
+    const docentesview = ({_id,name,numberid,telephone,address,files,fromProfession}) => {
+        const pro = fromProfession[0].name
         const pdf = folderImages+files;
         Alertas(`Información docente: `,
             `
@@ -303,7 +306,7 @@ export default function Docentes(){
                     </tr>
                     <tr>
                         <td>Profesión</td>
-                        <td>${profession}</td>
+                        <td>${pro}</td>
                     </tr>
                     <tr>
                         <td>Teléfono</td>
@@ -321,16 +324,16 @@ export default function Docentes(){
                 </tbody>
             </table>
            `
-            )
+            ,0)
     }
 
-    const docentesedit = ({id,name,numberid,idpro,telephone,address,files}) => {
+    const docentesedit = ({_id,name,numberid,profession,telephone,address,files}) => {
         setBtntea("Actualizar")
         inp.current.value = name
         inpcedula.current.value = numberid
         inpcedula.current.setAttribute('readonly', true)
         inpcedula.current.classList.add('bg-light')
-        inpPro.current.value = idpro
+        inpPro.current.value = profession
         inpTel.current.value = telephone
         inpDir.current.value = address
 
@@ -342,7 +345,7 @@ export default function Docentes(){
         btnedit.innerText = "Actualizar"
         btnedit.id = 'btn_insert_sche'
         btnedit.name = 'btn_insert_sche'
-        btnedit.onclick = function() { docentesupdate(id,files) }
+        btnedit.onclick = function() { docentesupdate(_id,files) }
 
         const btncancel = document.createElement('button')
         btncancel.setAttribute('class', 'btn btn-primary mx-3 my-3')
@@ -404,7 +407,7 @@ export default function Docentes(){
      
         Putdata('docentes/edit',formdata).then((res) => {
 
-            if(res?.data?.affectedRows > 0){
+            if(res?.data?.matchedCount > 0){
                 const div = document.getElementById("btntea")
                 div.innerHTML = ""
 
