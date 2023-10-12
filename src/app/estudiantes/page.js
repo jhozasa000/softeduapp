@@ -1,5 +1,4 @@
 "use client"
-import { Reducer } from "../components/context/themecontext";
 import { Getdata } from "../components/functions/Getdata";
 import { Postdata } from "../components/functions/Postdata";
 import { Putdata } from "../components/functions/Putdata";
@@ -24,7 +23,6 @@ export default function Estudiantes(){
     const inpIdnumber = useRef(null)
     const inpGra = useRef(null)
     const inpStudent = useRef(null)
-    const { datasite, setDatasite } = Reducer();
     const [fillstu, setFillstu] = useState('');
     const [load, setLoad] = useState(true);
     const [loadrel, setLoadrel] = useState(true);
@@ -42,14 +40,11 @@ export default function Estudiantes(){
         loaddata()
         setLoad(false)
         setLoadstu(false)
-    },[load,loadstu]);
-
-    useEffect(() => {
         filldatarelationship()
         loaddatarelationship()
         setLoadrel(false)
         setLoadsturel(false)
-    },[loadrel,loadsturel]);
+    },[load,loadstu,loadrel,loadsturel]);
 
     const insertStudent = () => {
         const namestu = inpStu.current.value.trim()
@@ -80,7 +75,7 @@ export default function Estudiantes(){
                 return false
             }else{
                 Postdata('estudiantes/insert',datos).then((res) => {
-                    if(res?.data?.affectedRows > 0){
+                    if(res?.data?.acknowledged){
                         Alertas('Información', `Se inserto el estudiante en el sistema`)
                         inpStu.current.value = ''
                         inpLast.current.value = ''
@@ -125,7 +120,7 @@ export default function Estudiantes(){
                     }).then((result) => {
                         if (result.isConfirmed) {
                             Putdata('estudiantes/delete',datos).then(res => {
-                                if(res?.data?.affectedRows > 0 ){
+                                if(res?.data?.matchedCount > 0 ){
                                     Alertas('Información',`Se eliminó a ${name} del sistema`)
                                     setLoadstu(true)
                                 }
@@ -233,7 +228,7 @@ export default function Estudiantes(){
         }
 
         Putdata('estudiantes/edit',datos).then((res) => {
-            if(res?.data?.affectedRows > 0){
+            if(res?.data?.matchedCount > 0){
                 const div = document.getElementById("btnstuchange")
                 div.innerHTML = ""
 
@@ -303,7 +298,7 @@ export default function Estudiantes(){
                 return false
             }else{
                 Postdata('estudiantesrelacion/insert',datos).then((res) => {
-                    if(res?.data?.affectedRows > 0){
+                    if(res?.data?.acknowledged){
                         Alertas('Información', `Se inserto la relación en el sistema`)
                         inpStudent.current.value  = ''
                         inpGra.current.value  = ''
@@ -319,6 +314,10 @@ export default function Estudiantes(){
 
 const loaddatarelationship = () =>{
     Getdata('estudiantesrelacion/select').then((info)=>{
+
+        console.log('info  ---   ', info);
+
+
         setFillrela( info.data.map(({id, name, lastname, numberid ,namegra ,namecal , namejor},x) =>{
 
             const estudiantesrelaciondelete = (id) =>{
@@ -336,7 +335,7 @@ const loaddatarelationship = () =>{
                 }).then((result) => {
                     if (result.isConfirmed) {
                         Putdata('estudiantesrelacion/delete',datos).then(res => {
-                            if(res?.data?.affectedRows > 0 ){
+                            if(res?.data?.matchedCount > 0 ){
                                 Alertas('Información',`Se eliminó  ${name} ${lastname} - ${numberid} del sistema`)
                                 setLoadsturel(true)
                             }
@@ -419,7 +418,7 @@ const estudiantesrelacionupdate = (id) => {
             return false
         }else{
             Putdata('estudiantesrelacion/edit',datos).then((res) => {
-                if(res?.data?.affectedRows > 0){
+                if(res?.data?.matchedCount > 0){
                     const div = document.getElementById("btnsturelchange")
                     div.innerHTML = ""
 
@@ -542,7 +541,7 @@ const estudiantesrelacionupdate = (id) => {
                         </div>
                     </div>
                     <div className="col-sm-12 col-md-12 mb-2" >
-                        <div className="card h-100">
+                        <div className="card h-100 mb-4">
                             {fillrela}
                         </div>
                     </div>
