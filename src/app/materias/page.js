@@ -1,5 +1,4 @@
 "use client"
-import { Reducer } from "../components/context/themecontext";
 import { Getdata } from "../components/functions/Getdata";
 import { Postdata } from "../components/functions/Postdata";
 import { Putdata } from "../components/functions/Putdata";
@@ -19,7 +18,6 @@ export default function Materias(){
     const inpCl = useRef(null)
     const inpGra = useRef(null)
     const inpTeac = useRef(null)
-    const { datasite, setDatasite } = Reducer();
     const [loadsubject, setLoadsubject] = useState(true);
     const [fillcor, setFillcor] = useState('');
     const [fillcl, setFillcl] = useState('');
@@ -56,7 +54,7 @@ export default function Materias(){
                 return false
             }else{
                 Postdata('materias/insert',datos).then((res) => {
-                    if(res?.data?.affectedRows > 0){
+                    if(res?.data?.acknowledged){
                         Alertas('Información', `Se inserto la materias en el sistema`)
                         inputNomCourse.current.value = ''
                         setLoadsubject(true)
@@ -70,7 +68,7 @@ export default function Materias(){
     }
     const loaddata = () =>{
         Getdata('materias/select').then((info)=>{
-            setFillcor( info.data.map(({id, name},x) =>{
+            setFillcor( info.data.map(({_id, name},x) =>{
 
                 const materiasdelete = (id) =>{
                     const datos = {
@@ -87,7 +85,7 @@ export default function Materias(){
                     }).then((result) => {
                         if (result.isConfirmed) {
                             Putdata('materias/delete',datos).then(res => {
-                                if(res?.data?.affectedRows > 0 ){
+                                if(res?.data?.matchedCount > 0 ){
                                     Alertas('Información',`Se eliminó la ${name} del sistema`)
                                     setLoadsubject(true)
                                 }
@@ -101,14 +99,14 @@ export default function Materias(){
                             <div className="ms-2 me-auto ">
                                 <i className="bi bi-arrow-right-circle ms-3">{name}</i>
                             </div>
-                            <span><a onClick={() => materiasdelete(id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
+                            <span><a onClick={() => materiasdelete(_id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
                             <span><a onClick={() => materiasedit(info.data[x])}><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></a></span>
                         </li>
             }))
         })   
     }
 
-    const materiasedit = ({id,name}) => {
+    const materiasedit = ({_id,name}) => {
         setBtnpro("Actualizar")
         inputNomCourse.current.value = name
         const div = document.getElementById("btncoursechange")
@@ -119,7 +117,7 @@ export default function Materias(){
         btnedit.innerText = "Actualizar"
         btnedit.id = 'btn_insert_sche'
         btnedit.name = 'btn_insert_sche'
-        btnedit.onclick = function() { materiasupdate(id) }
+        btnedit.onclick = function() { materiasupdate(_id) }
 
         const btncancel = document.createElement('button')
         btncancel.setAttribute('class', 'btn btn-primary mx-3 my-3')
@@ -165,7 +163,7 @@ export default function Materias(){
                 return false
             }else{
                 Putdata('materias/edit',datos).then((res) => {
-                    if(res?.data?.affectedRows > 0){
+                    if(res?.data?.matchedCount > 0){
                         const div = document.getElementById("btncoursechange")
                         div.innerHTML = ""
 
@@ -193,18 +191,18 @@ export default function Materias(){
 
     const filldatarelationship = () => {
         Getdata('materias/select').then((info)=>{
-            setFillcl( info.data.map(({id, name},x) =>{
-                return <option key={x+1} value={id}>{name}</option>
+            setFillcl( info.data.map(({_id, name},x) =>{
+                return <option key={x+1} value={_id}>{name}</option>
             }))
         })
         Getdata('grados/select').then((info)=>{
-            setFillpro( info.data.map(({idgra, namegra,namecal,namejor},x) =>{
-                return <option key={x+1} value={idgra}>{namegra +' - '+ namecal  +' - '+ namejor}</option>
+            setFillpro( info.data.map(({_id, name,fromCal,fromJor},x) =>{
+                return <option key={x+1} value={_id}>{name +' - '+ fromCal.name  +' - '+ fromJor.name}</option>
             }))
         })
         Getdata('docentes/select').then((info)=>{
-            setFilltea( info.data.map(({id,name,numberid,profession},x) =>{
-                return <option key={x+1} value={id}>{name +' - '+ numberid +' - '+ profession}</option>
+            setFilltea( info.data.map(({_id,name,numberid,fromProfession},x) =>{
+                return <option key={x+1} value={_id}>{name +' - '+ numberid +' - '+ fromProfession[0].name}</option>
             }))
         })
         
@@ -232,7 +230,7 @@ export default function Materias(){
                 return false
             }else{
                 Postdata('materiasrelacion/insert',datos).then((res) => {
-                    if(res?.data?.affectedRows > 0){
+                    if(res?.data?.matchedCount > 0){
                         Alertas('Información', `Se inserto la relación en el sistema`)
                         inpCl.current.value = ''
                         inpGra.current.value = ''
@@ -249,7 +247,7 @@ export default function Materias(){
 
     const loadrel = () =>{
         Getdata('materiasrelacion/select').then((info)=>{
-            setFillrela( info.data.map(({id, idm,idg,idd, namemat,namegra,namedoc,namepro,namecal,namejor,numberid},x) =>{
+            setFillrela( info.data.map(({id, namemat,namegra,namedoc,namepro,namecal,namejor,numberid},x) =>{
 
                 const materiasrelaciondelete = (id) =>{
                     const datos = {
@@ -266,7 +264,7 @@ export default function Materias(){
                     }).then((result) => {
                         if (result.isConfirmed) {
                             Putdata('materiasrelacion/delete',datos).then(res => {
-                                if(res?.data?.affectedRows > 0 ){
+                                if(res?.data?.matchedCount > 0 ){
                                     Alertas('Información',`Se eliminó la ${namemat} del sistema`)
                                     setLoadrela(true)
                                 }
@@ -354,7 +352,7 @@ export default function Materias(){
                 return false
             }else{
                 Putdata('materiasrelacion/edit',datos).then((res) => {
-                    if(res?.data?.affectedRows > 0){
+                    if(res?.data?.matchedCount > 0){
                         const div = document.getElementById("btnrelchange")
                         div.innerHTML = ""
 
