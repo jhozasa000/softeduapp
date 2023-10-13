@@ -26,15 +26,15 @@ export default function Grados(){
     useEffect(() => {
             setLoadcourse(false)
             Getdata('calendario/select').then((info)=>{
-                setFillcal( info.data.map(({_id, name},x) =>{
-                    return <option key={x+1} value={_id}>{name}</option>
+                setFillcal( info.data.map(({id, name},x) =>{
+                    return <option key={x+1} value={id}>{name}</option>
 
                 }))
             })
 
             Getdata('jornada/select').then((info)=>{
-                setFillday( info.data.map(({_id, name},x) =>{
-                    return <option key={x+1} value={_id}>{name}</option>
+                setFillday( info.data.map(({id, name},x) =>{
+                    return <option key={x+1} value={id}>{name}</option>
 
                 }))
             })
@@ -79,7 +79,7 @@ export default function Grados(){
 
     const loaddata = () =>{
         Getdata('grados/select').then((info)=>{
-            setFillcor( info.data.map(({_id, name,fromCal,fromJor},x) => {
+            setFillcor( info.data.map(({id, name,fromCal,fromJor},x) => {
 
                 const gradosdelete = (id) =>{
                     const datos = {
@@ -111,7 +111,7 @@ export default function Grados(){
                                 <div className='text-primary fw-bold'>{name}</div>
                                 <i className="bi bi-arrow-right-circle ms-3">{fromCal.name} - {fromJor.name}</i>
                             </div>
-                            <span><a onClick={() => gradosdelete(_id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
+                            <span><a onClick={() => gradosdelete(id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
                             <span><a onClick={() => gradosedit(info.data[x])}><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></a></span>
                         </li>
             }))
@@ -119,7 +119,7 @@ export default function Grados(){
     }
 
 
-    const gradosedit = ({_id, name,idcal,idjor}) => {
+    const gradosedit = ({id, name,idcal,idjor}) => {
         setBtnpro("Actualizar")
         inputNomCourse.current.value = name
         inputcal.current.value = idcal
@@ -133,7 +133,7 @@ export default function Grados(){
         btnedit.innerText = "Actualizar"
         btnedit.id = 'btn_insert_sche'
         btnedit.name = 'btn_insert_sche'
-        btnedit.onclick = function() { gradosupdate(_id) }
+        btnedit.onclick = function() { gradosupdate(id) }
 
         const btncancel = document.createElement('button')
         btncancel.setAttribute('class', 'btn btn-primary mx-3 my-3')

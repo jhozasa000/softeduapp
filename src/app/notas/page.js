@@ -34,6 +34,14 @@ export default function Notas(){
 
 
     const loadNotes = (fillnotes,filldata,position) => {
+
+
+        console.log('fillnotes   --  ', fillnotes);
+        console.log('filldata   --  ', filldata);
+        console.log('position   --  ', position);
+
+
+
             const cont = document.getElementById('fill');
 
             const tbl = document.createElement("table")
@@ -81,7 +89,7 @@ export default function Notas(){
             tblHead.appendChild(trhead)
             tbl.appendChild(tblHead)
         
-        if(!fillnotes.length){
+        if(!fillnotes){
             let tbtr = ''
             tbtr = document.createElement('tr')
             let td = document.createElement('td')
@@ -91,61 +99,62 @@ export default function Notas(){
             td.appendChild(cellTextmat);
             tbtr.appendChild(td);
             tblBody.appendChild(tbtr)
-        }
+        }else{
 
-        fillnotes.map(({name,period,notas},x) => {
-            
-            let tbtr = ''
-            tbtr = document.createElement('tr')
-            let td = document.createElement('td')
-            let cellTextmat = document.createTextNode(FirstletterUpper(name));
-            td.appendChild(cellTextmat);
-            tbtr.appendChild(td);
-
-            td = document.createElement('td')
-            td.setAttribute('class','text-center')
-            cellTextmat = document.createTextNode(period);
-            td.appendChild(cellTextmat);
-            tbtr.appendChild(td);
-            tblBody.appendChild(tbtr)
-
-            const len = notas.length
-            let pro = 0
-
-            notas.map(({id,num}) => {
+            fillnotes.map(({name,period,notas},x) => {
+                
+                let tbtr = ''
+                tbtr = document.createElement('tr')
                 let td = document.createElement('td')
-                td.setAttribute('class','text-center')     
-                pro += parseFloat(num)
-                let inp = document.createElement('input')
-                inp.setAttribute("type", "number")
-                inp.setAttribute('id',`inputnoteup-${id}`)
-                inp.setAttribute('class','form-control form-control-sm border-primary')
-                inp.setAttribute("max", 100)
-                inp.setAttribute("min", 0.0)
-                inp.setAttribute("step", 0.0)
-              //  inp.onkeyup = () => updatenote (id)
-                inp.onchange = () => updatenote (id)
-                inp.value = Number.parseFloat(num).toFixed(1)
-                td.appendChild(inp);
+                let cellTextmat = document.createTextNode(FirstletterUpper(name));
+                td.appendChild(cellTextmat);
+                tbtr.appendChild(td);
+
+                td = document.createElement('td')
+                td.setAttribute('class','text-center')
+                cellTextmat = document.createTextNode(period);
+                td.appendChild(cellTextmat);
                 tbtr.appendChild(td);
                 tblBody.appendChild(tbtr)
-            })
 
-            for(let f = 0;f < (quantity - len);f++){
-                let td = document.createElement('td')
-                const cellText = document.createTextNode('');
+                const len = notas.length
+                let pro = 0
+
+                notas.map(({id,num}) => {
+                    let td = document.createElement('td')
+                    td.setAttribute('class','text-center')     
+                    pro += parseFloat(num)
+                    let inp = document.createElement('input')
+                    inp.setAttribute("type", "number")
+                    inp.setAttribute('id',`inputnoteup-${id}`)
+                    inp.setAttribute('class','form-control form-control-sm border-primary')
+                    inp.setAttribute("max", 100)
+                    inp.setAttribute("min", 0.0)
+                    inp.setAttribute("step", 0.0)
+                //  inp.onkeyup = () => updatenote (id)
+                    inp.onchange = () => updatenote (id)
+                    inp.value = Number.parseFloat(num).toFixed(1)
+                    td.appendChild(inp);
+                    tbtr.appendChild(td);
+                    tblBody.appendChild(tbtr)
+                })
+
+                for(let f = 0;f < (quantity - len);f++){
+                    let td = document.createElement('td')
+                    const cellText = document.createTextNode('');
+                    td.appendChild(cellText);
+                    tbtr.appendChild(td);
+                }
+                td = document.createElement('td')
+                td.setAttribute('class','text-center')
+    
+                let proFinal = pro / len
+
+                const cellText = document.createTextNode(proFinal.toFixed(1));
                 td.appendChild(cellText);
                 tbtr.appendChild(td);
-            }
-            td = document.createElement('td')
-            td.setAttribute('class','text-center')
- 
-            let proFinal = pro / len
-
-            const cellText = document.createTextNode(proFinal.toFixed(1));
-            td.appendChild(cellText);
-            tbtr.appendChild(td);
-        })
+            })
+        }
 
         tbl.setAttribute('class', 'table table-bordered border-primary table-sm table-striped  ')
         tbl.appendChild(tblBody)
@@ -179,7 +188,7 @@ export default function Notas(){
               }).then((result) => {
                 if (result.isConfirmed) {
                     Putdata('notas/edit',datos).then(res => {
-                        if(res?.data?.affectedRows > 0){
+                        if(res?.data?.matchedCount > 0){
                             Alertas('Información', `Se actualizaron las notas en el sistema`)
                             loaddatanotes()
                         }else if(res?.data?.error){
@@ -193,7 +202,7 @@ export default function Notas(){
         }else{
             
             Putdata('notas/edit',datos).then(res => {
-                if(res?.data?.affectedRows > 0){
+                if(res?.data?.matchedCount > 0){
                     Alertas('Información', `Se actualizaron las notas en el sistema`)
                     loaddatanotes()
                 }else if(res?.data?.error){
@@ -219,6 +228,10 @@ export default function Notas(){
             }))
 
             Postdata('notas/select',datos).then( info => {
+
+                console.log('info....   ', info);
+
+
                 setLoadselstu( info.data.map(({id, idstu, name,lastname},x) =>{
                     Postdata('notas/findnotes',{idstu:idstu}).then(respu => {
                         loadNotes(respu.data,info.data,x)
@@ -264,7 +277,7 @@ export default function Notas(){
             }
 
             Postdata('notas/insert',datos).then((res) => {
-                if(res?.data?.affectedRows > 0){
+                if(res?.data?.acknowledged){
                     Alertas('Información', `Se inserto la nota en el sistema`)
                     loaddatanotes()
                 }else if(res?.data?.error){
@@ -283,6 +296,11 @@ export default function Notas(){
                     }
         document.getElementById('fill').innerHTML = ''
         Postdata('notas/select',datos).then( info => {
+
+
+                console.log('info    ', info);
+
+
                 info.data.map(({idstu},x) => {
                 Postdata('notas/findnotes',{idstu:idstu}).then(respu => {
                     loadNotes(respu.data,info.data,x)

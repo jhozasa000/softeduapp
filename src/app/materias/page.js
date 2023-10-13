@@ -68,7 +68,7 @@ export default function Materias(){
     }
     const loaddata = () =>{
         Getdata('materias/select').then((info)=>{
-            setFillcor( info.data.map(({_id, name},x) =>{
+            setFillcor( info.data.map(({id, name},x) =>{
 
                 const materiasdelete = (id) =>{
                     const datos = {
@@ -99,14 +99,14 @@ export default function Materias(){
                             <div className="ms-2 me-auto ">
                                 <i className="bi bi-arrow-right-circle ms-3">{name}</i>
                             </div>
-                            <span><a onClick={() => materiasdelete(_id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
+                            <span><a onClick={() => materiasdelete(id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
                             <span><a onClick={() => materiasedit(info.data[x])}><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></a></span>
                         </li>
             }))
         })   
     }
 
-    const materiasedit = ({_id,name}) => {
+    const materiasedit = ({id,name}) => {
         setBtnpro("Actualizar")
         inputNomCourse.current.value = name
         const div = document.getElementById("btncoursechange")
@@ -117,7 +117,7 @@ export default function Materias(){
         btnedit.innerText = "Actualizar"
         btnedit.id = 'btn_insert_sche'
         btnedit.name = 'btn_insert_sche'
-        btnedit.onclick = function() { materiasupdate(_id) }
+        btnedit.onclick = function() { materiasupdate(id) }
 
         const btncancel = document.createElement('button')
         btncancel.setAttribute('class', 'btn btn-primary mx-3 my-3')
@@ -191,18 +191,18 @@ export default function Materias(){
 
     const filldatarelationship = () => {
         Getdata('materias/select').then((info)=>{
-            setFillcl( info.data.map(({_id, name},x) =>{
-                return <option key={x+1} value={_id}>{name}</option>
+            setFillcl( info.data.map(({id, name},x) =>{
+                return <option key={x+1} value={id}>{name}</option>
             }))
         })
         Getdata('grados/select').then((info)=>{
-            setFillpro( info.data.map(({_id, name,fromCal,fromJor},x) =>{
-                return <option key={x+1} value={_id}>{name +' - '+ fromCal.name  +' - '+ fromJor.name}</option>
+            setFillpro( info.data.map(({id, name,fromCal,fromJor},x) =>{
+                return <option key={x+1} value={id}>{name +' - '+ fromCal.name  +' - '+ fromJor.name}</option>
             }))
         })
         Getdata('docentes/select').then((info)=>{
-            setFilltea( info.data.map(({_id,name,numberid,fromProfession},x) =>{
-                return <option key={x+1} value={_id}>{name +' - '+ numberid +' - '+ fromProfession[0].name}</option>
+            setFilltea( info.data.map(({id,name,numberid,fromProfession},x) =>{
+                return <option key={x+1} value={id}>{name +' - '+ numberid +' - '+ fromProfession[0].name}</option>
             }))
         })
         
@@ -230,7 +230,7 @@ export default function Materias(){
                 return false
             }else{
                 Postdata('materiasrelacion/insert',datos).then((res) => {
-                    if(res?.data?.matchedCount > 0){
+                    if(res?.data?.acknowledged){
                         Alertas('Información', `Se inserto la relación en el sistema`)
                         inpCl.current.value = ''
                         inpGra.current.value = ''

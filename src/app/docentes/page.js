@@ -72,7 +72,7 @@ export default function Docentes(){
 
     const loaddata = () =>{
         Getdata('profesion/select').then((info)=>{
-            setFillpro( info.data.map(({_id, name},x) =>{
+            setFillpro( info.data.map(({id, name},x) =>{
 
                 const profesiondelete = (id) =>{
                     const datos = {
@@ -103,14 +103,14 @@ export default function Docentes(){
                             <div className="ms-2 me-auto ">
                                 <i className="bi bi-arrow-right-circle ms-3">{name}</i>
                             </div>
-                            <span><a onClick={() => profesiondelete(_id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
+                            <span><a onClick={() => profesiondelete(id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
                             <span><a onClick={() => profesionedit(info.data[x])}><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></a></span>
                         </li>
             }))
         })   
     }
 
-    const profesionedit = ({_id,name}) => {
+    const profesionedit = ({id,name}) => {
         setBtnpro("Actualizar")
         inputNomProfesion.current.value = name
         const div = document.getElementById("btnprochange")
@@ -121,7 +121,7 @@ export default function Docentes(){
         btnedit.innerText = "Actualizar"
         btnedit.id = 'btn_insert_sche'
         btnedit.name = 'btn_insert_sche'
-        btnedit.onclick = function() { profesionupdate(_id) }
+        btnedit.onclick = function() { profesionupdate(id) }
 
         const btncancel = document.createElement('button')
         btncancel.setAttribute('class', 'btn btn-primary mx-3 my-3')
@@ -191,8 +191,8 @@ export default function Docentes(){
 
     const fillcareers = () => {
         Getdata('profesion/select').then((info)=>{
-            setfillcarr( info.data.map(({_id, name},x) =>{
-                return <option key={x+1} value={_id}>{name}</option>
+            setfillcarr( info.data.map(({id, name},x) =>{
+                return <option key={x+1} value={id}>{name}</option>
             }))
         })
     }
@@ -249,7 +249,7 @@ export default function Docentes(){
 
             console.log('docentes load    ', info);
 
-            setFillteacher( info.data.map(({_id, name, numberid, fromProfession},x) =>{
+            setFillteacher( info.data.map(({id, name, numberid, fromProfession},x) =>{
 
                 const docentesdelete = (id) =>{
                     const datos = {
@@ -282,14 +282,14 @@ export default function Docentes(){
                                 <i className="bi bi-arrow-right-circle ms-3">{fromProfession[0].name}</i>
                         </div>
                         <span><a onClick={() => docentesview(info.data[x])}><i className="bi bi-person-rolodex fs-4 px-2 text-primary"></i></a></span>
-                        <span><a onClick={() => docentesdelete(_id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
+                        <span><a onClick={() => docentesdelete(id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
                         <span><a onClick={() => docentesedit(info.data[x])}><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></a></span>
                     </li>
             }))
         })   
     }
 
-    const docentesview = ({_id,name,numberid,telephone,address,files,fromProfession}) => {
+    const docentesview = ({id,name,numberid,telephone,address,files,fromProfession}) => {
         const pro = fromProfession[0].name
         const pdf = folderImages+files;
         Alertas(`Información docente: `,
@@ -327,7 +327,7 @@ export default function Docentes(){
             ,0)
     }
 
-    const docentesedit = ({_id,name,numberid,profession,telephone,address,files}) => {
+    const docentesedit = ({id,name,numberid,profession,telephone,address,files}) => {
         setBtntea("Actualizar")
         inp.current.value = name
         inpcedula.current.value = numberid
@@ -345,7 +345,7 @@ export default function Docentes(){
         btnedit.innerText = "Actualizar"
         btnedit.id = 'btn_insert_sche'
         btnedit.name = 'btn_insert_sche'
-        btnedit.onclick = function() { docentesupdate(_id,files) }
+        btnedit.onclick = function() { docentesupdate(id,files) }
 
         const btncancel = document.createElement('button')
         btncancel.setAttribute('class', 'btn btn-primary mx-3 my-3')

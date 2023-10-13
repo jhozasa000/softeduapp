@@ -61,7 +61,7 @@ const insert = () =>{
 
 const load = () =>{
 Getdata('anuncios/select').then((info)=>{
-    setFillusers( info.data.map(({_id, title,description,date},x) => {
+    setFillusers( info.data.map(({id, title,description,date},x) => {
         const anunciosdelete = (id) =>{
             const datos = {
                 id:id
@@ -93,14 +93,14 @@ Getdata('anuncios/select').then((info)=>{
                     <div className='text-primary fw-bold'>Titulo - {title} | Fecha - {date}</div>
                         <i className="bi bi-arrow-right-circle ms-3">{description}</i>
                     </div>
-                    <span><a onClick={() => anunciosdelete(_id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
+                    <span><a onClick={() => anunciosdelete(id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
                     <span><a onClick={() => anunciosedit(info.data[x])}><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></a></span>
                 </li>
     }))
 })   
 }
 
-const anunciosedit = ({_id,title,description,date}) => {
+const anunciosedit = ({id,title,description,date}) => {
     // se setean los valores en los input
     inptitle.current.value = title
     inpdescription.current.value = description
@@ -117,7 +117,7 @@ const anunciosedit = ({_id,title,description,date}) => {
     btnedit.innerText = "Actualizar"
     btnedit.id = 'btn_insert_sche'
     btnedit.name = 'btn_insert_sche'
-    btnedit.onclick = function() { anunciosupdate(_id) }
+    btnedit.onclick = function() { anunciosupdate(id) }
 
     const btncancel = document.createElement('button')
     btncancel.setAttribute('class', 'btn btn-primary mx-3 my-3')

@@ -64,7 +64,7 @@ const insert = () =>{
 
 const load = () =>{
 Getdata('usuarios/select').then((info)=>{
-    setFillusers( info.data.map(({_id, user},x) =>{
+    setFillusers( info.data.map(({id, user},x) =>{
 
         const usuariosdelete = (id) =>{
             const datos = {
@@ -97,14 +97,14 @@ Getdata('usuarios/select').then((info)=>{
                     <div className='text-primary fw-bold'>Usuario</div>
                         <i className="bi bi-arrow-right-circle ms-3">{user}</i>
                     </div>
-                    <span><a onClick={() => usuariosdelete(_id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
+                    <span><a onClick={() => usuariosdelete(id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
                     <span><a onClick={() => usuariosedit(info.data[x])}><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></a></span>
                 </li>
     }))
 })   
 }
 
-const usuariosedit = ({_id,user,pass}) => {
+const usuariosedit = ({id,user,pass}) => {
     // se setean los valores en los input
     inpuser.current.value = user
     inppass.current.value = pass
@@ -118,7 +118,7 @@ const usuariosedit = ({_id,user,pass}) => {
     btnedit.innerText = "Actualizar"
     btnedit.id = 'btn_insert_sche'
     btnedit.name = 'btn_insert_sche'
-    btnedit.onclick = function() { usuariosupdate(_id) }
+    btnedit.onclick = function() { usuariosupdate(id) }
 
     const btncancel = document.createElement('button')
     btncancel.setAttribute('class', 'btn btn-primary mx-3 my-3')

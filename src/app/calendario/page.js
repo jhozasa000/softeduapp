@@ -65,7 +65,7 @@ export default function Calendario(){
 
     const loaddata = () =>{
         Getdata('calendario/select').then((info)=>{
-            setFillcall( info.data.map(({_id, name},x) =>{
+            setFillcall( info.data.map(({id, name},x) =>{
 
                 const calendariodelete = (id) =>{
                     const datos = {
@@ -96,14 +96,14 @@ export default function Calendario(){
                             <div className="ms-2 me-auto ">
                                 <i className="bi bi-arrow-right-circle ms-3">{name}</i>
                             </div>
-                            <span><a onClick={() => calendariodelete(_id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
+                            <span><a onClick={() => calendariodelete(id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
                             <span><a onClick={() => calendarioedit(info.data[x])}><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></a></span>
                         </li>
             }))
         })   
     }
 
-    const calendarioedit = ({_id,name}) => {
+    const calendarioedit = ({id,name}) => {
         setBtncal("Actualizar")
         inputNomCal.current.value = name
         const div = document.getElementById("btncalchange")
@@ -114,7 +114,7 @@ export default function Calendario(){
         btnedit.innerText = "Actualizar"
         btnedit.id = 'btn_insert_sche'
         btnedit.name = 'btn_insert_sche'
-        btnedit.onclick = function() { calendarioupdate(_id) }
+        btnedit.onclick = function() { calendarioupdate(id) }
 
         const btncancel = document.createElement('button')
         btncancel.setAttribute('class', 'btn btn-primary mx-3 my-3')
@@ -215,7 +215,7 @@ export default function Calendario(){
     const loaddataschoolday = () =>{
 
         Getdata('jornada/select').then((info)=>{
-            setFillschoolday( info.data.map(({_id, name},x) =>{
+            setFillschoolday( info.data.map(({id, name},x) =>{
 
                 const jornadadelete = (id) =>{
                     const datos = {
@@ -246,14 +246,14 @@ export default function Calendario(){
                             <div className="ms-2 me-auto ">
                                 <i className="bi bi-arrow-right-circle ms-3">{name}</i>
                             </div>
-                            <span><a onClick={() => jornadadelete(_id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
+                            <span><a onClick={() => jornadadelete(id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
                             <span><a onClick={() => jornadaedit(info.data[x])}><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></a></span>
                         </li>
             }))
         })  
     }
 
-    const jornadaedit = ({_id,name}) => {
+    const jornadaedit = ({id,name}) => {
         setBtnjor("Actualizar")
         inputNomSchoolday.current.value = name
         const div = document.getElementById("btnjornada")
@@ -264,7 +264,7 @@ export default function Calendario(){
         btnedit.innerText = "Actualizar"
         btnedit.id = 'btn_insert_jor'
         btnedit.name = 'btn_insert_jor'
-        btnedit.onclick = function() { jornadaupdate(_id) }
+        btnedit.onclick = function() { jornadaupdate(id) }
 
         const btncancel = document.createElement('button')
         btncancel.setAttribute('class', 'btn btn-primary mx-3 my-3')
