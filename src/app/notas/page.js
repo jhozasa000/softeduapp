@@ -89,7 +89,7 @@ export default function Notas(){
             tblHead.appendChild(trhead)
             tbl.appendChild(tblHead)
         
-        if(!fillnotes){
+        if(!fillnotes.length){
             let tbtr = ''
             tbtr = document.createElement('tr')
             let td = document.createElement('td')

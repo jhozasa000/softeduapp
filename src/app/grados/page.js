@@ -79,14 +79,14 @@ export default function Grados(){
 
     const loaddata = () =>{
         Getdata('grados/select').then((info)=>{
-            setFillcor( info.data.map(({id, name,fromCal,fromJor},x) => {
+            setFillcor( info.data.map(({id, namegra,namecal,namejor},x) => {
 
                 const gradosdelete = (id) =>{
                     const datos = {
                         id:id
                     }
                     Swal.fire({
-                        title: `<strong>¿Desea eliminar: ${name} - ${fromCal.name} - ${fromJor.name}?</strong>`,
+                        title: `<strong>¿Desea eliminar: ${namegra} - ${namecal} - ${namejor}?</strong>`,
                         showDenyButton: false,
                         showCancelButton: true,
                         confirmButtonText:'Eliminar',
@@ -97,7 +97,7 @@ export default function Grados(){
                         if (result.isConfirmed) {
                             Putdata('grados/delete',datos).then(res => {
                                 if(res?.data?.matchedCount > 0 ){
-                                    Alertas('Información',`Se eliminó el ${name} - ${fromCal.name} - ${fromJor.name} del sistema`)
+                                    Alertas('Información',`Se eliminó el ${namegra} - ${namecal} - ${namejor} del sistema`)
                                     setLoadcourse(true)
                                 }
                             })
@@ -108,8 +108,8 @@ export default function Grados(){
 
                 return <li key={x} className="list-group-item d-flex border-0 align-items-center justify-content-center">
                             <div className="ms-2 me-auto">
-                                <div className='text-primary fw-bold'>{name}</div>
-                                <i className="bi bi-arrow-right-circle ms-3">{fromCal.name} - {fromJor.name}</i>
+                                <div className='text-primary fw-bold'>{namegra}</div>
+                                <i className="bi bi-arrow-right-circle ms-3">{namecal} - {namejor}</i>
                             </div>
                             <span><a onClick={() => gradosdelete(id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
                             <span><a onClick={() => gradosedit(info.data[x])}><i className="bi bi-pencil-square fs-4 px-2 text-success"></i></a></span>
@@ -119,9 +119,9 @@ export default function Grados(){
     }
 
 
-    const gradosedit = ({id, name,idcal,idjor}) => {
+    const gradosedit = ({id, namegra,idcal,idjor}) => {
         setBtnpro("Actualizar")
-        inputNomCourse.current.value = name
+        inputNomCourse.current.value = namegra
         inputcal.current.value = idcal
         inputjor.current.value = idjor
 

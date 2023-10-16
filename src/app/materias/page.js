@@ -196,13 +196,13 @@ export default function Materias(){
             }))
         })
         Getdata('grados/select').then((info)=>{
-            setFillpro( info.data.map(({id, name,fromCal,fromJor},x) =>{
-                return <option key={x+1} value={id}>{name +' - '+ fromCal.name  +' - '+ fromJor.name}</option>
+            setFillpro( info.data.map(({id, namegra,namecal,namejor},x) =>{
+                return <option key={x+1} value={id}>{namegra +' - '+ namecal  +' - '+ namejor}</option>
             }))
         })
         Getdata('docentes/select').then((info)=>{
-            setFilltea( info.data.map(({id,name,numberid,fromProfession},x) =>{
-                return <option key={x+1} value={id}>{name +' - '+ numberid +' - '+ fromProfession[0].name}</option>
+            setFilltea( info.data.map(({id,name,numberid,profession},x) =>{
+                return <option key={x+1} value={id}>{name +' - '+ numberid +' - '+ profession}</option>
             }))
         })
         

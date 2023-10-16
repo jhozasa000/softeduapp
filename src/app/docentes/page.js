@@ -221,7 +221,6 @@ export default function Docentes(){
                 formdata.append('telephone',inpTel.current.value.trim());
                 formdata.append('address',inpDir.current.value.trim());    
                 formdata.append(`files`, inpFile?.current?.files[0]??'');
-     
   
                 Postdata('docentes/insert',formdata).then((res) => {
 
@@ -247,9 +246,8 @@ export default function Docentes(){
     const loaddataTeacher = () =>{
         Getdata('docentes/select').then((info)=>{
 
-            console.log('docentes load    ', info);
 
-            setFillteacher( info.data.map(({id, name, numberid, fromProfession},x) =>{
+            setFillteacher( info.data.map(({id, name, numberid, profession},x) =>{
 
                 const docentesdelete = (id) =>{
                     const datos = {
@@ -279,7 +277,7 @@ export default function Docentes(){
                 return <li key={x} className="list-group-item d-flex text-start text-wrap">
                         <div className="ms-2 me-auto">
                             <div className='text-primary fw-bold'>{name} - {numberid}</div>
-                                <i className="bi bi-arrow-right-circle ms-3">{fromProfession[0].name}</i>
+                                <i className="bi bi-arrow-right-circle ms-3">{profession}</i>
                         </div>
                         <span><a onClick={() => docentesview(info.data[x])}><i className="bi bi-person-rolodex fs-4 px-2 text-primary"></i></a></span>
                         <span><a onClick={() => docentesdelete(id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>
@@ -289,8 +287,7 @@ export default function Docentes(){
         })   
     }
 
-    const docentesview = ({id,name,numberid,telephone,address,files,fromProfession}) => {
-        const pro = fromProfession[0].name
+    const docentesview = ({id,name,numberid,telephone,address,files,profession}) => {
         const pdf = folderImages+files;
         Alertas(`Información docente: `,
             `
@@ -306,7 +303,7 @@ export default function Docentes(){
                     </tr>
                     <tr>
                         <td>Profesión</td>
-                        <td>${pro}</td>
+                        <td>${profession}</td>
                     </tr>
                     <tr>
                         <td>Teléfono</td>
@@ -327,13 +324,13 @@ export default function Docentes(){
             ,0)
     }
 
-    const docentesedit = ({id,name,numberid,profession,telephone,address,files}) => {
+    const docentesedit = ({id,name,numberid,idpro,telephone,address,files}) => {
         setBtntea("Actualizar")
         inp.current.value = name
         inpcedula.current.value = numberid
         inpcedula.current.setAttribute('readonly', true)
         inpcedula.current.classList.add('bg-light')
-        inpPro.current.value = profession
+        inpPro.current.value = idpro
         inpTel.current.value = telephone
         inpDir.current.value = address
 
