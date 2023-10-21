@@ -420,8 +420,6 @@ export default function Docentes(){
             console.log('files---    ', files);
             //eliminamos blob vercel
             if(files){
-                console.log('entro file delete actual');
-                console.log('entro file delete actual     ', files);
                  await del(files,{
                             token: process.env.BLOB_READ_WRITE_TOKEN
                         })
@@ -436,7 +434,6 @@ export default function Docentes(){
 
         if(!archivo){
             archivo = files??''
-            console.log('data de la base de datos')
         }
         const datos = {
             id: id,

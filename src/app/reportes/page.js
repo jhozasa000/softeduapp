@@ -112,7 +112,6 @@ export default function Reportes(){
                         font-size:12px;
                         font-family: "Times New Roman", Times, serif;
                         width:100%;
-                        border-color:#3386FF;
                       }
                       .text-center{
                           text-align:center;
