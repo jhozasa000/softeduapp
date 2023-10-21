@@ -4,14 +4,13 @@ import { Postdata } from "../components/functions/Postdata";
 import { Alertas, FirstletterUpper } from "../components/functions/helpers";
 import Menu from "../components/menu/Menu"
 import { useRef } from 'react';
-import html2pdf from 'html2pdf.js'
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable'
 
 const metadata = {
     title: 'Reportes',
     description: 'Reportes',
   }
-
-const folderReport = process.env.REACT_APP_FOLDER_REPORT
 
 export default function Reportes(){    
 
@@ -97,69 +96,26 @@ export default function Reportes(){
         
         
         
-        let table = `<table class='table'><thead>${theadinfo}</thead><tbody>${tbody}</tbody></table>`
+        let table = `<table id="loadreporttable" class='table table-bordered'><thead>${theadinfo}</thead><tbody>${tbody}</tbody></table>`
 
-        const html = `<!DOCTYPE html>
-                <html lang="es">  
-                  <head>    
-                    <title>Reporte de notas</title>    
-                    <meta charset="UTF-8">
-                    <meta name="title" content="Reporte notas">
-                    <meta name="description" content="Generar reporte estudiante">    
-                    <style type="text/css">
-                    table {
-                        border-collapse: collapse;
-                        font-size:12px;
-                        font-family: "Times New Roman", Times, serif;
-                        width:100%;
-                      }
-                      .text-center{
-                          text-align:center;
-                      }
-                    th {
-                        background: #2c7be5;
-                        color:#ffffff;
-                      }
-                      
-                      th, td {
-                        border: 1px solid #ccc;
-                        padding: 8px;
-                      }
-                      
-                      tr:nth-child(even) {
-                        background: rgba(44, 123, 229, 0.5);
-                      }
-                      .negrilla{
-                        font-weight: bold;
-                      }
-                    </style>
-                  </head>  
-                  <body>    
-                    <header>
+        const html = `<header>
                       <h1>Reporte de notas</h1>      
                     </header>
                     <section> 
                        <div class="table-responsive"> ${table} </div>
-                    </section>
-                  </body>  
-                </html>`
+                    </section>`
 
 
-        const div = document.getElementById('loadpdf')
+        const contenedor = document.getElementById('loadpdf')
+        contenedor.innerHTML = html
 
-        div.innerHTML = html
 
-        var opt = {
-            margin:       1,
-            filename:     'reporte.pdf',
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 4 },
-            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-        };
-          
-          // New Promise-based usage:
-            html2pdf().set(opt).from(div).save();
-
+        const doc = new jsPDF();
+        autoTable(doc, { 
+          html: '#loadreporttable'  ,
+          theme:'striped',
+        })
+        doc.save('reporte.pdf')
     }
 
     return(
