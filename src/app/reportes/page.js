@@ -1,8 +1,10 @@
 "use client"
+import 'dotenv/config'
 import { Postdata } from "../components/functions/Postdata";
 import { Alertas, FirstletterUpper } from "../components/functions/helpers";
 import Menu from "../components/menu/Menu"
 import { useRef } from 'react';
+import html2pdf from 'html2pdf.js'
 
 const metadata = {
     title: 'Reportes',
@@ -100,7 +102,7 @@ export default function Reportes(){
         const html = `<!DOCTYPE html>
                 <html lang="es">  
                   <head>    
-                    <title>Reporte de ${name} ${lastname}</title>    
+                    <title>Reporte de notas</title>    
                     <meta charset="UTF-8">
                     <meta name="title" content="Reporte notas">
                     <meta name="description" content="Generar reporte estudiante">    
@@ -110,6 +112,7 @@ export default function Reportes(){
                         font-size:12px;
                         font-family: "Times New Roman", Times, serif;
                         width:100%;
+                        border-color:#3386FF;
                       }
                       .text-center{
                           text-align:center;
@@ -137,22 +140,32 @@ export default function Reportes(){
                       <h1>Reporte de notas</h1>      
                     </header>
                     <section> 
-                        ${table}
+                       <div class="table-responsive"> ${table} </div>
                     </section>
                   </body>  
                 </html>`
 
-        const datos = {htmlpdf:html}
-        Postdata('reportes/report',datos).then( info => {
-            let link = document.createElement("a");
-            link.download = info.data;
-            link.href = `${folderReport}${info.data}`
-            link.click();
-        })
+
+        const div = document.getElementById('loadpdf')
+
+        div.innerHTML = html
+
+        var opt = {
+            margin:       1,
+            filename:     'reporte.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 4 },
+            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+          
+          // New Promise-based usage:
+            html2pdf().set(opt).from(div).save();
+
     }
 
     return(
         <main>
+            <title>{'Reportes'}</title>
             <Menu flag='reportes' />  
             <div className="container-fluid mt-5"> 
                 <div className="row">
@@ -171,6 +184,7 @@ export default function Reportes(){
 
                                 </div>
                             </form> 
+                            <div className="container-fluid" id='loadpdf'></div>
                         </div>
                     </div>
                 </div>

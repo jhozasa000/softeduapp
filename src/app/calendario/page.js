@@ -337,6 +337,7 @@ export default function Calendario(){
 
     return(
         <main>
+            <title>{'Calendario Jornada'}</title>
             <Menu flag='calendario' />
             <div className="container-fluid mt-5"> 
                 <div className="row ">

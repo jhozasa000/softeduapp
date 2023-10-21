@@ -446,6 +446,7 @@ const estudiantesrelacionupdate = (id) => {
 
     return(
         <main>
+            <title>{'Estudiantes'}</title>
             <Menu flag='estudiantes' />
             <div className="container-fluid mt-5"> 
                 <div className="row">

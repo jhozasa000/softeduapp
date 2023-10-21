@@ -216,6 +216,7 @@ export default function Grados(){
 
     return(
         <main>
+            <title>{'Grados'}</title>
             <Menu flag='grados' />
             <div className="container-fluid mt-5"> 
                 <div className="row">

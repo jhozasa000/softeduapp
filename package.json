@@ -11,12 +11,15 @@
   "dependencies": {
     "@popperjs/core": "^2.11.8",
     "@types/react": "^18.2.9",
+    "@vercel/blob": "^0.14.0",
     "@vercel/nft": "^0.22.6",
     "axios": "^1.5.0",
     "bootstrap": "^5.3.0",
     "bootstrap-icons": "^1.10.5",
     "chart.js": "^4.3.0",
     "dotenv": "^16.3.1",
+    "html2pdf": "^0.0.11",
+    "html2pdf.js": "^0.10.1",
     "next": "^13.4.4",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
@@ -27,5 +30,8 @@
   },
   "devDependencies": {
     "@types/bootstrap": "^5.2.6"
+  },
+  "browser": {
+    "child_process": false
   }
 }

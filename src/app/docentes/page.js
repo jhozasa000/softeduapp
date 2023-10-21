@@ -1,4 +1,5 @@
 "use client"
+import 'dotenv/config'
 import { Getdata } from "../components/functions/Getdata";
 import { Postdata } from "../components/functions/Postdata";
 import { Putdata } from "../components/functions/Putdata";
@@ -6,7 +7,9 @@ import { Alertas } from "../components/functions/helpers";
 import Menu from "../components/menu/Menu"
 import { useEffect, useRef, useState } from 'react';
 import Swal from 'sweetalert2';
-const folderImages = process.env.REACT_APP_FOLDER_IMAGE
+
+import { put } from '@vercel/blob';
+import { del } from '@vercel/blob';
 
 const metadata = {
     title: 'Docentes',
@@ -38,10 +41,6 @@ export default function Docentes(){
         setLoadteacher(false)
         loaddataTeacher()
     }, [loadpro,loadteacher]);
-
-  /*  useEffect(() => {
-        
-    }, []);*/
 
     //funciones profesion
     const insertBachelor = () =>{
@@ -209,21 +208,36 @@ export default function Docentes(){
             numberid:id,
         }
 
-        Postdata('docentes/select',datos).then((ele) => {
+        Postdata('docentes/select',datos).then(async (ele) => {
             if(ele?.data?.length){
                 Alertas('Información','Ya existe un docente registrado con la cédula ',inpcedula.current.value)
                 return false
             }else{
-                const formdata = new FormData()
-                formdata.append('name',inp.current.value.trim());
-                formdata.append('numberid',inpcedula.current.value.trim());
-                formdata.append('profession',inpPro.current.value.trim());
-                formdata.append('telephone',inpTel.current.value.trim());
-                formdata.append('address',inpDir.current.value.trim());    
-                formdata.append(`files`, inpFile?.current?.files[0]??'');
-  
-                Postdata('docentes/insert',formdata).then((res) => {
+                let blobdata = ''
+                if(inpFile?.current?.files[0]){
+                    const file = inpFile?.current?.files[0]
 
+                    if(file.size > 2097152){
+                        Alertas('Información','El tamaño del archivo es superior a 2 mb')
+                        return false
+                    }
+                    const blob = await put(file.name, file, {
+                                            access: 'public',
+                                            token: process.env.BLOB_READ_WRITE_TOKEN
+                                        }); 
+                    blobdata = blob.url
+                }
+
+                const datos = {
+                    name : inp.current.value.trim() ,
+                    numberid : inpcedula.current.value.trim() ,
+                    profession :  inpPro.current.value.trim(),
+                    telephone :  inpTel.current.value.trim(),
+                    address :  inpDir.current.value.trim(),
+                    files :  blobdata
+                }
+  
+                Postdata('docentes/insert',datos).then((res) => {
                     if(res?.data?.error){
                         Alertas('Información',res?.data?.error)
                     }
@@ -288,7 +302,10 @@ export default function Docentes(){
     }
 
     const docentesview = ({id,name,numberid,telephone,address,files,profession}) => {
-        const pdf = folderImages+files;
+
+        console.log('files    ', files)
+
+
         Alertas(`Información docente: `,
             `
             <table class="table text-start">
@@ -316,7 +333,7 @@ export default function Docentes(){
                     </tr>
                     <tr>
                         <td>Archivo PDF</td>
-                        <td>${files.length?`<a href="${pdf}" download="docente-${numberid}.pdf">descargar</a>`:'0 archivos'}</td>
+                        <td>${files.length?`<a href="${files}" download="docente-${numberid}.pdf">descargar</a>`:'0 archivos'}</td>
                     </tr>
                 </tbody>
             </table>
@@ -378,7 +395,7 @@ export default function Docentes(){
         inpFile.current.value = ''
     }
 
-    const docentesupdate = (id,files) => {
+    const docentesupdate = async  (id,files) => {
 
         const name = inp.current.value.trim()
         const numberid =inpcedula.current.value.trim()
@@ -392,17 +409,46 @@ export default function Docentes(){
             return false
         }
 
-        const formdata = new FormData()
-        formdata.append('id',id);
-        formdata.append('name',name);
-        formdata.append('numberid',numberid);
-        formdata.append('profession',profession);
-        formdata.append('telephone',telephone);
-        formdata.append('address',address);    
-        formdata.append(`files`, filesnew);
-        formdata.append(`filesbd`, files);
+        let archivo = ''
+        if(filesnew){
+            const file = inpFile?.current?.files[0]
+
+            if(file.size > 2097152){
+                Alertas('Información','El tamaño del archivo es superior a 2 mb')
+                return false
+            }
+            console.log('files---    ', files);
+            //eliminamos blob vercel
+            if(files){
+                console.log('entro file delete actual');
+                console.log('entro file delete actual     ', files);
+                 await del(files,{
+                            token: process.env.BLOB_READ_WRITE_TOKEN
+                        })
+            }
+           //subimos archivo blob vercel
+            const blob = await put(file.name, file, {
+                                    access: 'public',
+                                    token: process.env.BLOB_READ_WRITE_TOKEN
+                                }); 
+            archivo = blob.url
+        }
+
+        if(!archivo){
+            archivo = files??''
+            console.log('data de la base de datos')
+        }
+        const datos = {
+            id: id,
+            name : inp.current.value.trim() ,
+            numberid : inpcedula.current.value.trim() ,
+            profession :  inpPro.current.value.trim(),
+            telephone :  inpTel.current.value.trim(),
+            address :  inpDir.current.value.trim(),
+            files :  archivo
+        }
      
-        Putdata('docentes/edit',formdata).then((res) => {
+        Putdata('docentes/edit',datos).then((res) => {
 
             if(res?.data?.matchedCount > 0){
                 const div = document.getElementById("btntea")
@@ -437,6 +483,7 @@ export default function Docentes(){
 
     return(
         <main>
+            <title>{'Docentes'}</title>
             <Menu flag='docentes' />
             <div className="container-fluid mt-5"> 
                 <div className="row">

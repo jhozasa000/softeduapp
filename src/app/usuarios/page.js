@@ -196,6 +196,7 @@ const usuariosupdate = (id) => {
 
   return (
           <main>
+            <title>{'Usuarios'}</title>
             <Menu flag='usuarios' /> 
             <div className="container-fluid mt-5"> 
                 <div className="row">

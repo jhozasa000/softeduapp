@@ -311,6 +311,7 @@ export default function Notas(){
 
     return(
         <main>
+            <title>{'Notas'}</title>
             <Menu flag='notas' />
             <div className="container-fluid mt-5"> 
                 <div className="row">

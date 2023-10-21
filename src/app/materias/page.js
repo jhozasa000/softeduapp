@@ -382,6 +382,7 @@ export default function Materias(){
 
     return(
         <main>
+            <title>{'Materias'}</title>
             <Menu flag='materias' />
             <div className="container-fluid mt-5"> 
                 <div className="row">
