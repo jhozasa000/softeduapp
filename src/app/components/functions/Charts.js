@@ -1,111 +1,77 @@
 "use client"
-import { Chart } from "chart.js";
-import * as Chartjs from "chart.js";
+import { useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
-import { Postdata } from "./Postdata";
-import { Getdata } from "./Getdata";
-
+import { Getdata } from './Getdata';
+import { Chart } from 'chart.js';
+import * as Chartjs from 'chart.js';
 
 const Barcharts = () => {
-  let nuevoArray    = []
-  let arrayTemporal = []
-
-  const data = {
+  const [data, setData] = useState({
     labels: [],
-    datasets: [{
-      label: 'Bajo',
-      data: [0,0,0,0], //[trimestre 1,trimestre 2, trimestre 3, trimestre 4]
-      backgroundColor: [
-        'rgba(255, 99, 132, 0.2)',
-      ],
-      borderColor: [
-        'rgba(255, 99, 132, 1)',
-      ],
-      borderWidth:2,
-      
-    },{
-        label: 'Medio',
-        data: [0,0,0,0],
-        backgroundColor: [
-          'rgba(255, 206, 86, 0.2)',
-        ],
-        borderColor: [
-          'rgba(255, 206, 86, 1)',
-        ],
-        borderWidth:2,
-        
-      },
-      {
-        label: 'Alto',
-        data: [0,0,0,0],
-        backgroundColor: [
-          'rgba(75, 192, 192, 0.2)'
-        ],
-        borderColor: [
-          'rgba(75, 192, 192, 1)',
-        ],
-        borderWidth:2,
-        
-      }],
-    
-  }
+    datasets: [
+      { label: 'Bajo', data: [0, 0, 0, 0], backgroundColor: 'rgba(255, 99, 132, 0.2)', borderColor: 'rgba(255, 99, 132, 1)', borderWidth: 2 },
+      { label: 'Medio', data: [0, 0, 0, 0], backgroundColor: 'rgba(255, 206, 86, 0.2)', borderColor: 'rgba(255, 206, 86, 1)', borderWidth: 2 },
+      { label: 'Alto', data: [0, 0, 0, 0], backgroundColor: 'rgba(75, 192, 192, 0.2)', borderColor: 'rgba(75, 192, 192, 1)', borderWidth: 2 }
+    ],
+  });
 
-const controllers = Object.values(Chartjs).filter(
-  (chart) => chart.id !== undefined
-);
-Chart.register(...controllers);
+  useEffect(() => {
+    const fetchData = async () => {
+      let nuevoArray = [];
+      let arrayTemporal = [];
+      const newLabels = [];
+      const newDatasets = [...data.datasets];
 
+      const respu = await Getdata('notas/loadnotescharts');
+      const ele = respu.data;
 
-  Getdata('notas/loadnotescharts').then(respu => {
-    const ele = respu.data
-    ele.map(({period, notas, idstu}) =>{
-      arrayTemporal = nuevoArray.filter(resp => resp.period == period  && resp.idstu == idstu)
-      let sum = 0; 
-      let len = notas.length ;
-      let sumPro = 0
-      notas.map(({num}) => {
-        sum += parseFloat(num)
-      })
-      sumPro = sum / len
-        if(arrayTemporal.length > 0){
-          nuevoArray[nuevoArray.indexOf(arrayTemporal[0])]["notas"].push(sumPro.toFixed(1))
-        }else{
-          nuevoArray.push({'idstu':idstu,'period':period,'notas':[sumPro.toFixed(1)]})
-          if(data.labels.indexOf(`Período ${period}`) == -1){
-            data.labels.push(`Período ${period}`)
+      ele.map(({ period, notas, idstu }) => {
+        arrayTemporal = nuevoArray.filter(resp => resp.period == period && resp.idstu == idstu);
+        let sum = notas.reduce((acc, { num }) => acc + parseFloat(num), 0);
+        let sumPro = sum / notas.length;
+
+        if (arrayTemporal.length > 0) {
+          nuevoArray[nuevoArray.indexOf(arrayTemporal[0])].notas.push(sumPro.toFixed(1));
+        } else {
+          nuevoArray.push({ idstu, period, notas: [sumPro.toFixed(1)] });
+          if (!newLabels.includes(`Período ${period}`)) {
+            newLabels.push(`Período ${period}`);
           }
         }
-    })
+      });
 
+      nuevoArray.forEach(({ period, notas }) => {
+        let pro = notas.reduce((acc, num) => acc + parseFloat(num), 0);
+        let proFinal = (pro / notas.length).toFixed(1);
 
-    nuevoArray.map(({period,notas}) =>{
-        console.log('period    ', period);
-        let pro = 0
-        let len = notas.length
-        notas.map((num) => {
-          pro += parseFloat(num)
-        })
-
-        let proFinal = (pro / len).toFixed(1)
-        if(proFinal < 3){
-          data.datasets[0].data[period-1] += 1
-        }else if(proFinal >=3 && proFinal < 4){
-          data.datasets[1].data[period-1] += 1
-        }else{
-          data.datasets[2].data[period-1] += 1
+        if (proFinal < 3) {
+          newDatasets[0].data[period - 1] += 1;
+        } else if (proFinal >= 3 && proFinal < 4) {
+          newDatasets[1].data[period - 1] += 1;
+        } else {
+          newDatasets[2].data[period - 1] += 1;
         }
-    })
-    
+      });
 
-  })  
-    return  <Bar
-                data={data}
-                width={700}
-                height={150}
-                options={{
-                    maintainAspectRatio: false
-                }}
-            />
-}  
+      setData({ labels: newLabels, datasets: newDatasets });
+    };
 
-export {Barcharts}
+    fetchData();
+  }, []);
+
+  const controllers = Object.values(Chartjs).filter(chart => chart.id !== undefined);
+  Chart.register(...controllers);
+
+  return (
+    <Bar
+      data={data}
+      width={700}
+      height={300}
+      options={{
+        maintainAspectRatio: false,
+      }}
+    />
+  );
+};
+
+export { Barcharts };
