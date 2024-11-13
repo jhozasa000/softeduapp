@@ -35,12 +35,7 @@ export default function Notas(){
 
     const loadNotes = (fillnotes,filldata,position) => {
 
-
-        console.log('fillnotes   --  ', fillnotes);
-        console.log('filldata   --  ', filldata);
-        console.log('position   --  ', position);
-
-
+        document.getElementById('fill').innerHTML = ''
 
             const cont = document.getElementById('fill');
 
@@ -217,6 +212,9 @@ export default function Notas(){
     const findstudent = () =>{
         const val = inputSearch.current.value
         document.getElementById('fill').innerHTML = ''
+        setFillselperi('')
+        setLoadselstu('')
+        setFillselmat('')
         if(val.length >= 3){
             const datos = {
                 datafind: val
@@ -228,9 +226,6 @@ export default function Notas(){
             }))
 
             Postdata('notas/select',datos).then( info => {
-
-                console.log('info....   ', info);
-
 
                 setLoadselstu( info.data.map(({id, idstu, name,lastname},x) =>{
                     Postdata('notas/findnotes',{idstu:idstu}).then(respu => {
@@ -293,14 +288,9 @@ export default function Notas(){
         const val = inputSearch.current.value
         const datos = {
                         datafind: val
-                    }
+                    }     
         document.getElementById('fill').innerHTML = ''
         Postdata('notas/select',datos).then( info => {
-
-
-                console.log('info    ', info);
-
-
                 info.data.map(({idstu},x) => {
                 Postdata('notas/findnotes',{idstu:idstu}).then(respu => {
                     loadNotes(respu.data,info.data,x)
