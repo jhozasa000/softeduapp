@@ -62,6 +62,9 @@ const Barcharts = () => {
   const controllers = Object.values(Chartjs).filter(chart => chart.id !== undefined);
   Chart.register(...controllers);
 
+  console.log('load data  ', data);
+  
+
   return (
     <Bar
       data={data}
