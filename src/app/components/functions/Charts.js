@@ -1,4 +1,3 @@
-"use client"
 import { useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Getdata } from './Getdata';
@@ -14,46 +13,54 @@ const Barcharts = () => {
       { label: 'Alto', data: [0, 0, 0, 0], backgroundColor: 'rgba(75, 192, 192, 0.2)', borderColor: 'rgba(75, 192, 192, 1)', borderWidth: 2 }
     ],
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
-      let nuevoArray = [];
-      let arrayTemporal = [];
-      const newLabels = [];
-      const newDatasets = [...data.datasets];
+      setLoading(true);
+      try {
+        let nuevoArray = [];
+        let arrayTemporal = [];
+        const newLabels = [];
+        const newDatasets = [...data.datasets];
 
-      const respu = await Getdata('notas/loadnotescharts');
-      const ele = respu.data;
+        const respu = await Getdata('notas/loadnotescharts');
+        const ele = respu.data;
 
-      ele.map(({ period, notas, idstu }) => {
-        arrayTemporal = nuevoArray.filter(resp => resp.period == period && resp.idstu == idstu);
-        let sum = notas.reduce((acc, { num }) => acc + parseFloat(num), 0);
-        let sumPro = sum / notas.length;
+        ele.forEach(({ period, notas, idstu }) => {
+          arrayTemporal = nuevoArray.filter(resp => resp.period === period && resp.idstu === idstu);
+          let sum = notas.reduce((acc, { num }) => acc + parseFloat(num), 0);
+          let sumPro = sum / notas.length;
 
-        if (arrayTemporal.length > 0) {
-          nuevoArray[nuevoArray.indexOf(arrayTemporal[0])].notas.push(sumPro.toFixed(1));
-        } else {
-          nuevoArray.push({ idstu, period, notas: [sumPro.toFixed(1)] });
-          if (!newLabels.includes(`Período ${period}`)) {
-            newLabels.push(`Período ${period}`);
+          if (arrayTemporal.length > 0) {
+            nuevoArray[nuevoArray.indexOf(arrayTemporal[0])].notas.push(sumPro.toFixed(1));
+          } else {
+            nuevoArray.push({ idstu, period, notas: [sumPro.toFixed(1)] });
+            if (!newLabels.includes(`Período ${period}`)) {
+              newLabels.push(`Período ${period}`);
+            }
           }
-        }
-      });
+        });
 
-      nuevoArray.forEach(({ period, notas }) => {
-        let pro = notas.reduce((acc, num) => acc + parseFloat(num), 0);
-        let proFinal = (pro / notas.length).toFixed(1);
+        nuevoArray.forEach(({ period, notas }) => {
+          let pro = notas.reduce((acc, num) => acc + parseFloat(num), 0);
+          let proFinal = (pro / notas.length).toFixed(1);
 
-        if (proFinal < 3) {
-          newDatasets[0].data[period - 1] += 1;
-        } else if (proFinal >= 3 && proFinal < 4) {
-          newDatasets[1].data[period - 1] += 1;
-        } else {
-          newDatasets[2].data[period - 1] += 1;
-        }
-      });
+          if (proFinal < 3) {
+            newDatasets[0].data[period - 1] += 1;
+          } else if (proFinal >= 3 && proFinal < 4) {
+            newDatasets[1].data[period - 1] += 1;
+          } else {
+            newDatasets[2].data[period - 1] += 1;
+          }
+        });
 
-      setData({ labels: newLabels, datasets: newDatasets });
+        setData({ labels: newLabels, datasets: newDatasets });
+      } catch (error) {
+        console.error("Error loading chart data:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchData();
@@ -62,18 +69,17 @@ const Barcharts = () => {
   const controllers = Object.values(Chartjs).filter(chart => chart.id !== undefined);
   Chart.register(...controllers);
 
-  console.log('load data  ', data);
-  
-
   return (
-    <Bar
-      data={data}
-      width={700}
-      height={300}
-      options={{
-        maintainAspectRatio: false,
-      }}
-    />
+    loading ? <p>Cargando datos...</p> : (
+      <Bar
+        data={data}
+        width={700}
+        height={300}
+        options={{
+          maintainAspectRatio: false,
+        }}
+      />
+    )
   );
 };
 
