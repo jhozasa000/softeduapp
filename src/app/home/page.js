@@ -16,7 +16,7 @@ export default function Home(){
             <div className="container"> 
                 <div className="row">
                     <div className="col-sm-12 col-md-6 text-center" >
-                        <h3 className="my-3">Notas estudiantes</h3>
+                        <h3 className="my-3">Notas promedio estudiantes</h3>
                             <div style={{height:'250px'}}>
                             <Barcharts />
                             </div>
