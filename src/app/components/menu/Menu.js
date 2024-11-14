@@ -5,10 +5,13 @@ import  Image  from 'next/image';
 import { FirstletterUpper } from '../functions/helpers';
 import { useEffect} from 'react';
 import styles from './menu.module.css';
-import Session from '../functions/Session';
+import { FiLogOut } from 'react-icons/fi';
+import { useGlobalContext } from '../context/themecontext';
+
 
 export default  function Menu(page) {
-
+    const { dispatch } = useGlobalContext() ;
+    
     useEffect(() => {
         import("bootstrap/dist/js/bootstrap");
     }, []);
@@ -34,16 +37,32 @@ export default  function Menu(page) {
 
     const load = <>
     <header>
-        <Session />
         <nav className="navbar">
             <div className="container-fluid">
                 <Link className="navbar-brand ms-5" href={'/home'}>
-                    <>
-                        <Image src={logomenu} width={200} alt='logo' className='img-fluid' priority />
-                    </>
+                    <Image src={logomenu} width={200} alt='logo' className='img-fluid' priority />
                 </Link>
                 <form className="d-flex" role="search">
-                <input className="form-control me-2" type="search" placeholder="Buscar" aria-label="Search" name="btn_search" id='btn_search'/>
+                {/* <input className="form-control me-2" type="search" placeholder="Buscar" aria-label="Search" name="btn_search" id='btn_search'/> */}
+
+                <button
+                    onClick={() => dispatch({ type: "LOGOUT"}) }
+                    className="form-control"
+                    type="button"
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '10px 10px',
+                        backgroundColor: '#f44336',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        fontSize: '16px',
+                    }}
+                    >
+                        <FiLogOut style={{ marginRight: '8px' }} />
+                    </button>
                 </form>
             </div>
         </nav>
