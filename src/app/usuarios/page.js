@@ -17,6 +17,8 @@ export default function Usuarios(){
     // declaracion de variables
   const inpuser = useRef(null)
   const inppass = useRef(null)
+  const inprol = useRef(null)
+  const inpmail = useRef(null)
   const [loadusers, setLoadusers] = useState(true);
   const [fillusers, setFillusers] = useState('');
   const [btnprorel, setBtnprorel] = useState('Insertar');
@@ -31,13 +33,21 @@ export default function Usuarios(){
 const insert = () =>{
     const inpS = inpuser.current.value.trim()
     const inpG = inppass.current.value.trim()
-    if(!inpS || !inpG){
+    const inpR = inprol.current.value.trim()
+    const inpM = inpmail.current.value.trim()
+
+    // console.log('(!inpS || !inpG || inpR || inpM)'     , (inpS || inpG || inpR || inpM));
+    
+
+    if(!inpS || !inpG || !inpR || !inpM){
         Alertas('Información','Los campos no pueden estar vacíos')
         return false
     }
     const datos = {
         user:inpS,
         pass:inpG,
+        role: inpR,
+        email : inpM,
         level:1,
         state:1
     }
@@ -52,6 +62,8 @@ const insert = () =>{
                     Alertas('Información', `Se inserto el usuario en el sistema`)
                     inpuser.current.value  = ''
                     inppass.current.value  = ''
+                    inprol.current.value  = ''
+                    inpmail.current.value  = ''
                     setLoadusers(true)
                 }else if(res?.data?.error){
                     Alertas('Información', res.data.error)
@@ -104,10 +116,12 @@ Getdata('usuarios/select').then((info)=>{
 })   
 }
 
-const usuariosedit = ({id,user,pass}) => {
+const usuariosedit = ({id,user,pass,role, email}) => {
     // se setean los valores en los input
     inpuser.current.value = user
     inppass.current.value = pass
+    inprol.current.value = role
+    inpmail.current.value = email
 
     const div = document.getElementById("btnsturelchange")
     div.innerHTML = ""
@@ -145,12 +159,17 @@ const usuarioscancel = () => {
     div.appendChild(btnedit)
     inpuser.current.value  = ''
     inppass.current.value  = ''
+    inprol.current.value = ''
+    inpmail.current.value = ''
 }
 
 const usuariosupdate = (id) => {
     const inpS = inpuser.current.value.trim()
     const inpG = inppass.current.value.trim()
-    if(!inpS || !inpG){
+    const inpR = inprol.current.value.trim()
+    const inpM = inpmail.current.value.trim()
+
+    if(!inpS || !inpG || !inpR || !inpM){
         Alertas('Información','Los campos no pueden estar vacíos')
         return false
     }
@@ -158,6 +177,8 @@ const usuariosupdate = (id) => {
     const datos = {
         user:inpS,
         pass:inpG,
+        role:inpR,
+        email:inpM,
         id:id
     }
 
@@ -182,6 +203,8 @@ const usuariosupdate = (id) => {
                     Alertas('Información', `Se actualizo el usuario en el sistema`)
                     inpuser.current.value = ''
                     inppass.current.value = ''
+                    inprol.current.value = ''
+                    inpmail.current.value = ''
                     setLoadusers(true)
                     
                 }else if(res?.data?.error){
@@ -212,7 +235,24 @@ const usuariosupdate = (id) => {
                             <div className="row align-items-center justify-content-center">
                                 <label htmlFor="inputPass" className="col-5 col-form-label col-form-label-sm fs-4 fw-bold">Clave usuario</label>
                                 <div className="col-6">
-                                    <input type="text" className="form-control border-primary my-3" name='inputPass' id="inputPass"  ref={inppass}/>
+                                    <input type="password"  className="form-control border-primary my-3" name='inputPass' id="inputPass"  ref={inppass}/>
+                                </div>
+                            </div>
+                            <div className="row align-items-center justify-content-center">
+                                <label htmlFor="inputUser" className="col-5 col-form-label col-form-label-sm fs-4 fw-bold">Rol</label>
+                                <div className="col-6">
+                                    {/* <input type="text" className="form-control border-primary my-3 " name='inputUser' id="inputUser"  ref={inpuser}/> */}
+                                    <select defaultValue={''} className="form-select border-primary my-3" ref={inprol} name="inprol" id="inprol">
+                                        <option disabled value={''}>Selecciona un rol</option>
+                                        <option value={'admin'}>Admin</option>
+                                        <option value={'user'}>Usuario</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="row align-items-center justify-content-center">
+                                <label htmlFor="inputUser" className="col-5 col-form-label col-form-label-sm fs-4 fw-bold">Correo</label>
+                                <div className="col-6">
+                                    <input type="text" className="form-control border-primary my-3 " name='inpmail' id="inpmail"  ref={inpmail}/>
                                 </div>
                             </div>
                             <div className="text-center" id="btnsturelchange"> <button className='btn btn-primary my-3 ' onClick={insert}>Insertar</button></div>
