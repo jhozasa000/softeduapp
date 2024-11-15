@@ -15,10 +15,10 @@ const Ads = () => {
             setParams(info.data.map(({id,title,description,date}) => {
                         return <li key={id} className="list-group-item d-flex text-start text-wrap">
                         <div className="ms-2 me-auto">
-                            <div className='text-primary fw-bold'>{title}</div>
+                            <div className='text-primary fw-bold'>{title} <span className='text-black m-2'>{date}</span></div>
                                 <i className="bi bi-arrow-right-circle ms-3">{description}</i>
                         </div>
-                        <span>{date}</span>
+                        
                     </li>
                 })
             )
@@ -26,8 +26,8 @@ const Ads = () => {
     }
 
     return (
-        <div className="card">
-            <div className={`card-body text-white ${styles.navblue}`}>
+        <div className="">
+            <div className={`card-body text-white`}>
                 <ul className='list-group'>
                     {params}
                 </ul>

@@ -94,7 +94,7 @@ Getdata('usuarios/select').then((info)=>{
         // se retorna lista 
         return <li key={x} className="list-group-item d-flex border-0 align-items-center justify-content-center">
                     <div className="ms-2 me-auto ">
-                    <div className='text-primary fw-bold'>Usuario</div>
+                    {/* <div className='text-primary fw-bold'>Usuario</div> */}
                         <i className="bi bi-arrow-right-circle ms-3">{user}</i>
                     </div>
                     <span><a onClick={() => usuariosdelete(id)}><i className="bi bi-trash fs-4 px-2 text-danger"></i></a></span>

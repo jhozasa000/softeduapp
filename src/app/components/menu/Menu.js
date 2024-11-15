@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link';
-import logomenu from '../../../../public/logo.png'
+import logomenu from '../../../../public/logo_dark.png'
 import  Image  from 'next/image';
 import { FirstletterUpper } from '../functions/helpers';
 import { useEffect} from 'react';

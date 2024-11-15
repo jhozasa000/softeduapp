@@ -51,13 +51,13 @@ export default function Login() {
         <div className="col-12">
           <Image src={logo} alt="logo" className="img-fluid mb-5" priority width={300} />
           <div className="mb-3 row align-items-center justify-content-center">
-            <label htmlFor="inputUser" className="col-3 col-form-label col-form-label-sm fs-4 fw-bold">Usuario</label>
+            <label htmlFor="inputUser" className="col-3 col-form-label col-form-label-sm fs-4 fw-bold text-white">Usuario</label>
             <div className="col-5 col-md-3 col-lg-3">
               <input type="text" className="form-control" name="inputUser" id="inputUser" ref={inputuser} />
             </div>
           </div>
           <div className="row align-items-center justify-content-center">
-            <label htmlFor="inputPassword" className="col-3 col-form-label col-form-label-sm fs-4 fw-bold">Clave</label>
+            <label htmlFor="inputPassword" className="col-3 col-form-label col-form-label-sm fs-4 fw-bold text-white">Clave</label>
             <div className="col-5 col-md-3 col-lg-3">
               <input type="password" className="form-control" name="inputPassword" id="inputPassword" ref={inputpass} />
             </div>

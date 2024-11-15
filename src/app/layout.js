@@ -5,6 +5,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { Context } from './components/context/themecontext';
 import Session from './components/functions/Session';
+import styles from './page.module.css';
 
 const roboto = Roboto({
   weight: ['300'],
@@ -18,7 +19,7 @@ export default function RootLayout({ children }) {
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
-      <body className={'bg-light ' + roboto.className}>
+      <body className={` ${roboto.className} ${styles.back}`}>
         <Context>
           <Session>{children}</Session>
         </Context>
