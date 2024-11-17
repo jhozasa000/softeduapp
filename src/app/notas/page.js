@@ -35,7 +35,7 @@ export default function Notas(){
 
     const loadNotes = (fillnotes,filldata,position) => {
 
-        document.getElementById('fill').innerHTML = ''
+        // document.getElementById('fill').innerHTML = ''
 
             const cont = document.getElementById('fill');
 
@@ -225,6 +225,7 @@ export default function Notas(){
                 return <option key={x+1} value={ele}>{ele}</option> 
             }))
 
+            document.getElementById('fill').innerHTML = ''
             Postdata('notas/select',datos).then( info => {
 
                 setLoadselstu( info.data.map(({id, idstu, name,lastname},x) =>{
