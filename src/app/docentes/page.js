@@ -225,7 +225,7 @@ export default function Docentes(){
                                             access: 'public',
                                             token: process.env.BLOB_READ_WRITE_TOKEN
                                         }); 
-                    blobdata = blob.url
+                    blobdata = blob.downloadUrl
                 }
 
                 const datos = {
@@ -302,9 +302,6 @@ export default function Docentes(){
     }
 
     const docentesview = ({id,name,numberid,telephone,address,files,profession}) => {
-
-        console.log('files    ', files)
-
 
         Alertas(`Información docente: `,
             `
@@ -417,7 +414,6 @@ export default function Docentes(){
                 Alertas('Información','El tamaño del archivo es superior a 2 mb')
                 return false
             }
-            console.log('files---    ', files);
             //eliminamos blob vercel
             if(files){
                  await del(files,{
@@ -429,7 +425,7 @@ export default function Docentes(){
                                     access: 'public',
                                     token: process.env.BLOB_READ_WRITE_TOKEN
                                 }); 
-            archivo = blob.url
+            archivo = blob.downloadUrl
         }
 
         if(!archivo){
