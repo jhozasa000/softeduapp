@@ -2,7 +2,7 @@
 import Swal from "sweetalert2";
 import { Getdata } from "../components/functions/Getdata";
 import { Postdata } from "../components/functions/Postdata";
-import { Alertas } from "../components/functions/helpers";
+import { Alertas, decryptPasskey, encryptPasskey } from "../components/functions/helpers";
 import Menu from "../components/menu/Menu"
 import { useRef , useState , useEffect} from 'react';
 import { Putdata } from "../components/functions/Putdata";
@@ -19,6 +19,7 @@ export default function Usuarios(){
   const inppass = useRef(null)
   const inprol = useRef(null)
   const inpmail = useRef(null)
+  let tempdata = ''
   const [loadusers, setLoadusers] = useState(true);
   const [fillusers, setFillusers] = useState('');
   const [btnprorel, setBtnprorel] = useState('Insertar');
@@ -45,7 +46,7 @@ const insert = () =>{
     }
     const datos = {
         user:inpS,
-        pass:inpG,
+        pass: encryptPasskey(inpG),
         role: inpR,
         email : inpM,
         level:1,
@@ -123,6 +124,7 @@ const usuariosedit = ({id,user,pass,role, email}) => {
     inprol.current.value = role
     inpmail.current.value = email
 
+    tempdata = pass
     const div = document.getElementById("btnsturelchange")
     div.innerHTML = ""
 
@@ -174,9 +176,10 @@ const usuariosupdate = (id) => {
         return false
     }
 
+    const passValidate = tempdata === inpG ? tempdata : encryptPasskey(inpG)
     const datos = {
         user:inpS,
-        pass:inpG,
+        pass:passValidate,
         role:inpR,
         email:inpM,
         id:id

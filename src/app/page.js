@@ -4,7 +4,7 @@ import styles from './page.module.css';
 import logo from '../../public/logo.png';
 import { useRef, useContext } from 'react';
 import { useRouter } from 'next/navigation';
-import { Alertas } from './components/functions/helpers';
+import { Alertas, decryptPasskey, encryptPasskey } from './components/functions/helpers';
 import { Postdata } from './components/functions/Postdata';
 import { useGlobalContext  } from './components/context/themecontext';
 
@@ -25,17 +25,21 @@ export default function Login() {
 
     const datos = {
       user: inpUser,
-      pass: inpPass,
+      // pass: inpPass,
       state: 1
     };
 
     Postdata('login', datos).then((ele) => {
       if (!ele.data.error) {
-        // Despachar la acción LOGIN para actualizar el contexto
-        dispatch({ type: "LOGIN", payload: ele.data });
-
-        // Redirigir al usuario
-        router.push('/home');
+        if(decryptPasskey(ele.data.pass) === inpPass){
+         // Despachar la acción LOGIN para actualizar el contexto
+          dispatch({ type: "LOGIN", payload: ele.data });
+          // Redirigir al usuario
+          router.push('/home');
+        }else{
+          Alertas('Información', "Validar la contraseña");
+          return false;
+        }
       } else {
         Alertas('Información', ele.data.error);
         return false;
